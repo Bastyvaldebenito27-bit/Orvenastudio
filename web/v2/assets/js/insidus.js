@@ -66,11 +66,14 @@ function pickLang() {
 
 /* ------------------------------------------------------------- locales -- */
 /* Bundles may be inlined (single-file build) or fetched from /locales.
-   Either way the components only ever see a resolved dictionary. */
+   CFG.locales moves that origin — a CDN, say — without moving the links,
+   which stay on BASE. Either way the components only ever see a resolved
+   dictionary. */
 var CACHE = W.INSIDUS_LOCALES || {};
+var LOCALES = CFG.locales || (BASE + "locales/");
 function loadLocale(lang) {
   if (CACHE[lang]) return Promise.resolve(CACHE[lang]);
-  return fetch(BASE + "locales/" + lang + ".json", { credentials: "same-origin" })
+  return fetch(LOCALES + lang + ".json", { credentials: "same-origin" })
     .then(function (r) {
       if (!r.ok) throw new Error("locale " + lang + " " + r.status);
       return r.json();

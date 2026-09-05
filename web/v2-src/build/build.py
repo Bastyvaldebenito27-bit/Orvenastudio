@@ -19,6 +19,9 @@ ASSETS = os.path.join(ROOT, "assets")
 
 # animation modules, in load order; each one is optional by contract
 ANIM = ["cinematic-intro.js", "global-map.js"]
+# Assets and locales can be served from elsewhere; the pages and their links
+# stay where they are. Empty means everything is served from the same origin.
+CDN = os.environ.get("INSIDUS_CDN", "").rstrip("/")
 IMG = os.path.join(ASSETS, "img")
 
 FACTS = {
@@ -321,6 +324,8 @@ def config_js(photos, thumbs, inline_locales=None):
         "photos": photos, "thumbs": thumbs,
         "base": "{BASE}",
     }
+    if CDN:
+        cfg["locales"] = CDN + "/locales/"
     out = "window.INSIDUS_CONFIG=" + json.dumps(cfg, ensure_ascii=False) + ";"
     if inline_locales is not None:
         out += "\nwindow.INSIDUS_LOCALES=" + json.dumps(inline_locales, ensure_ascii=False) + ";"
@@ -347,16 +352,16 @@ def build():
     en = C["en"]
 
     # ---- multi-file: home
-    photos = {k: "/assets/img/" + v for k, v in HI.items()}
-    thumbs = {k: "/assets/img/" + v for k, v in THUMBS.items() if os.path.exists(os.path.join(IMG, v))}
+    photos = {k: CDN + "/assets/img/" + v for k, v in HI.items()}
+    thumbs = {k: CDN + "/assets/img/" + v for k, v in THUMBS.items() if os.path.exists(os.path.join(IMG, v))}
     cfg = config_js(photos, thumbs).replace("{BASE}", "/")
     html = (head(en["meta"]["title"], en["meta"]["description"],
-                 '<link rel="stylesheet" href="/assets/css/insidus.css">')
+                 '<link rel="stylesheet" href="' + CDN + '/assets/css/insidus.css">')
             + '\n<body data-page="home">\n'
             + NAV.format(home="/") + HOME_MAIN + CONTACT
             + "\n<script>" + cfg + "</script>\n"
-            + '<script src="/assets/js/insidus.js" defer></script>\n'
-            + "".join('<script src="/assets/js/anim/%s" defer></script>\n' % a
+            + '<script src="' + CDN + '/assets/js/insidus.js" defer></script>\n'
+            + "".join('<script src="' + CDN + '/assets/js/anim/%s" defer></script>\n' % a
                        for a in ANIM)
             + "</body>\n</html>\n")
     write(os.path.join(DIST, "index.html"), html)
@@ -366,11 +371,11 @@ def build():
         cfgp = config_js(photos, thumbs).replace("{BASE}", "/")
         t = en["meta"]["productTitle"].format(**s)
         d = en["meta"]["productDesc"].format(**s)
-        ph = (head(t, d, '<link rel="stylesheet" href="/assets/css/insidus.css">')
+        ph = (head(t, d, '<link rel="stylesheet" href="' + CDN + '/assets/css/insidus.css">')
               + f'\n<body data-page="product" data-product="{s["slug"]}">\n'
               + NAV.format(home="/") + PRODUCT_MAIN + CONTACT
               + "\n<script>" + cfgp + "</script>\n"
-              + '<script src="/assets/js/insidus.js" defer></script>\n'
+              + '<script src="' + CDN + '/assets/js/insidus.js" defer></script>\n'
               + "</body>\n</html>\n")
         write(os.path.join(DIST, "products", s["slug"], "index.html"), ph)
 
