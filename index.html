@@ -8,7 +8,7 @@
 :root{
   color-scheme:light;
   --paper:#E9EBEA; --card:#FFFFFF; --ink:#0A0F11; --ash:#5C6668; --rule:#C6CBC9;
-  --deep:#08171D; --flare:#FF4A17;
+  --deep:#08171D; --flare:#FF4A17; --flare-text:#B33A0E;
   --fd:"Big Shoulders Display","Archivo Narrow",Impact,sans-serif;
   --fb:"Archivo","Helvetica Neue",Arial,sans-serif;
   --fm:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -24,7 +24,8 @@ a{color:inherit}
 
 .wrap{width:min(1240px,100% - 2.5rem);margin-inline:auto}
 .kicker{font-family:var(--fm);font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--flare);margin:0}
+  color:var(--flare-text);margin:0}
+.band--ink .kicker{color:var(--flare)}
 .h2{font-family:var(--fd);font-weight:800;text-transform:uppercase;line-height:.88;
   font-size:clamp(2.6rem,8vw,5.6rem);margin:.5rem 0 1rem}
 .lead{color:var(--ash);max-width:60ch;margin:0;font-size:clamp(.96rem,2vw,1.06rem)}
@@ -81,9 +82,12 @@ a{color:inherit}
 .beat__claim.is-out{opacity:0}
 .beat--brand .beat__hold{padding-bottom:clamp(4.4rem,11vh,6.5rem)}
 .cta{display:inline-block;font-family:var(--fm);font-size:.74rem;letter-spacing:.18em;
-  text-transform:uppercase;text-decoration:none;color:#fff;background:var(--flare);
-  padding:.85rem 1.7rem;border:1px solid var(--flare);transition:background .25s}
-.cta:hover{background:transparent}
+  text-transform:uppercase;text-decoration:none;color:var(--ink);background:var(--flare);
+  padding:.85rem 1.7rem;border:1px solid var(--flare);
+  transition:background .25s,color .25s,border-color .25s}
+.cta:hover,.cta:focus-visible{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cta--sm{padding:.48rem 1rem;font-size:.66rem;letter-spacing:.14em}
+@media (width < 560px){.cta--sm{display:none}}
 .intro__cap{position:absolute;right:0;bottom:0;z-index:4;font-family:var(--fm);font-size:.62rem;
   letter-spacing:.08em;color:rgba(255,255,255,.6);padding:.5rem .9rem;text-align:right;max-width:62%}
 .intro__ticks{position:absolute;left:0;right:0;bottom:2.3rem;z-index:4;display:flex;
@@ -126,7 +130,7 @@ a{color:inherit}
 .sp{flex:0 0 clamp(224px,25vw,286px);scroll-snap-align:start;background:var(--card);
   padding:1.3rem 1.25rem 1.5rem;display:flex;flex-direction:column;gap:.9rem;transition:background .3s}
 .sp:hover{background:#F7F8F8}
-.sp__ix{font-family:var(--fm);font-size:.66rem;letter-spacing:.16em;color:var(--flare)}
+.sp__ix{font-family:var(--fm);font-size:.66rem;letter-spacing:.16em;color:var(--flare-text)}
 .sp__frame{overflow:hidden;background:var(--paper)}
 .sp__img{width:100%;aspect-ratio:1;object-fit:cover;
   transition:transform .8s cubic-bezier(.2,.7,.3,1)}
@@ -134,11 +138,11 @@ a{color:inherit}
 .sp__name{font-family:var(--fd);font-weight:800;text-transform:uppercase;line-height:.9;
   font-size:clamp(1.5rem,3.4vw,2rem);margin:0}
 .sp__trade{font-family:var(--fm);font-size:.7rem;letter-spacing:.04em;color:var(--ash);margin:0}
-.sp__bino{font-family:var(--fm);font-style:italic;font-size:.72rem;color:var(--flare);margin:0}
+.sp__bino{font-family:var(--fm);font-style:italic;font-size:.72rem;color:var(--flare-text);margin:0}
 .sp__ask{font-family:var(--fm);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink);text-decoration:none;margin-top:auto;padding-top:.9rem;
   border-top:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center}
-.sp__ask:hover{color:var(--flare)}
+.sp__ask:hover{color:var(--flare-text)}
 .sp__ask b{font-weight:400;transition:transform .25s}
 .sp:hover .sp__ask b{transform:translateX(4px)}
 .strip__hint{font-family:var(--fm);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;
@@ -174,7 +178,7 @@ a{color:inherit}
 .team{display:grid;gap:1px;background:var(--rule);margin-top:2.6rem;
   grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
 .person{background:var(--paper);padding:1.5rem 1.3rem}
-.person__ini{font-family:var(--fd);font-weight:800;font-size:1.6rem;color:var(--flare);line-height:1}
+.person__ini{font-family:var(--fd);font-weight:800;font-size:1.6rem;color:var(--flare-text);line-height:1}
 .person__n{font-weight:600;font-size:.98rem;margin:.9rem 0 0}
 .person__r{font-family:var(--fm);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--ash);margin:.28rem 0 0}
@@ -197,6 +201,7 @@ a{color:inherit}
     <span class="bar__logo">INSIDUS</span>
     <div class="bar__right">
       <ul class="bar__nav" id="nav"></ul>
+      <a class="cta cta--sm" href="#contacto" id="nav-cta"></a>
       <select class="sel" id="lang" aria-label="Language / Idioma"></select>
     </div>
   </div>
@@ -356,7 +361,9 @@ function draw(code){
     var li=el("li"),a=el("a",null,d.nav[p[1]]);a.href=p[0];li.appendChild(a);nav.appendChild(li);
   });
 
-  set("b0-kicker",d.eyebrow);set("b0-cta",d.cta);
+  set("b0-kicker",d.eyebrow);set("b0-cta",d.cta);set("nav-cta",d.cta);
+  var nc=document.getElementById("nav-cta");
+  if(nc)nc.href="mailto:"+FACTS.email+"?subject="+encodeURIComponent(d.mailGeneral);
   document.getElementById("b0-cta").href="mailto:"+FACTS.email+
     "?subject="+encodeURIComponent(d.mailGeneral);
   claims(d.claims);

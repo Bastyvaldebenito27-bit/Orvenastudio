@@ -51,7 +51,9 @@ var nav=clr("nav");
 [["#nosotros",0],["#productos",1],["#planta",2],["#equipo",3],["#contacto",4]].forEach(function(p){
 var li=el("li"),a=el("a",null,d.nav[p[1]]);a.href=p[0];li.appendChild(a);nav.appendChild(li);
 });
-set("b0-kicker",d.eyebrow);set("b0-cta",d.cta);
+set("b0-kicker",d.eyebrow);set("b0-cta",d.cta);set("nav-cta",d.cta);
+var nc=document.getElementById("nav-cta");
+if(nc)nc.href="mailto:"+FACTS.email+"?subject="+encodeURIComponent(d.mailGeneral);
 document.getElementById("b0-cta").href="mailto:"+FACTS.email+
 "?subject="+encodeURIComponent(d.mailGeneral);
 claims(d.claims);
