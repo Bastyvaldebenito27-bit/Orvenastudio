@@ -25,14 +25,14 @@ Helpers: `INSIDUS.anim.slot(name)`, `INSIDUS.anim.section(name)`,
 
 ## The six stages
 
-| Name | Section id | Kind |
-|---|---|---|
-| `CinematicIntro` | `#cinematic-intro` | background |
-| `OceanTransition` | `#ocean-transition` | background |
-| `ProductAnimation` | `#product-animation` | stage |
-| `ProcessAnimation` | `#process-animation` | stage |
-| `GlobalMap` | `#global-map` | background |
-| `FinalAnimation` | `#final-animation` | background |
+| Name | Section id | Kind | Status |
+|---|---|---|---|
+| `CinematicIntro` | `#cinematic-intro` | background | `assets/js/anim/cinematic-intro.js` |
+| `OceanTransition` | `#ocean-transition` | background | free |
+| `ProductAnimation` | `#product-animation` | stage | free |
+| `ProcessAnimation` | `#process-animation` | stage | free |
+| `GlobalMap` | `#global-map` | background | `assets/js/anim/global-map.js` |
+| `FinalAnimation` | `#final-animation` | background | free |
 
 **Background** stages are absolutely positioned behind the section's own
 content, which stays legible on top. Draw atmosphere here — video, WebGL, a
@@ -94,3 +94,22 @@ INSIDUS.anim.register("CinematicIntro", function ({ stage, reduce }) {
 Lenis or any smooth-scroll layer can be initialised independently; the site
 uses native scrolling and CSS `scroll-behavior`, and nothing depends on
 scroll position except the navbar's solid state.
+
+## Modules already written
+
+Both live in `assets/js/anim/` and are listed in `ANIM` in `build/build.py`,
+which is the only place a new module has to be named. Remove a filename from
+that list and the site rebuilds without it, unchanged.
+
+**`cinematic-intro.js`** — splits the intro copy into letters and words and
+plays them in, over an SVG grid drawn on the page's own columns, drifting
+marine snow and a pointer light. It re-splits on `insidus:rendered`, so the
+sequence replays when the language changes.
+
+**`global-map.js`** — an orthographic globe on Canvas 2D. Natural Earth land
+at 110m, simplified to about 0.6° and delta-coded, comes to under 3 KB inside
+the file: no image, no CDN, no licence to check. San Antonio (33°35′S
+71°37′W) pulses as the origin and arcs leave it toward the four regions the
+section already lists — no market is named, because none is known. The loop
+runs only while the frame is on screen and the tab is visible; under reduced
+motion it paints one frame and stops.

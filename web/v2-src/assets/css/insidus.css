@@ -1,0 +1,436 @@
+/* ============================================================================
+   INSIDUS — visual system
+   Depth-based colour, editorial type, hairline grid, technical microtype.
+   Single committed world: deep water. Every colour painted explicitly.
+   ========================================================================= */
+
+:root{
+  color-scheme: dark;
+
+  /* --- depth ramp ------------------------------------------------------- */
+  --abyss:        #03070E;   /* near-black blue — the ground */
+  --deep:         #071C33;   /* deep navy — raised surfaces */
+  --pacific:      #0E4C92;   /* brand blue */
+  --ocean:        #2E7BC4;   /* secondary blue */
+  --ice:          #EDF3F8;   /* cold white — primary text */
+  --fog:          #8FA6BC;   /* blue-grey — secondary text */
+  --electric:     #3BE0E6;   /* luminous cyan — accents only, never fields */
+
+  /* --- derived, all defined here so nothing lives only in a media block -- */
+  --hairline:     rgba(143,166,188,.20);
+  --hairline-2:   rgba(143,166,188,.10);
+  --ice-dim:      rgba(237,243,248,.62);
+  --on-pacific:   var(--ice);
+
+  /* water: depth, not decoration */
+  --grad-depth:   linear-gradient(180deg, var(--abyss) 0%, #05121F 45%, var(--deep) 100%);
+  --grad-surface: radial-gradient(120% 80% at 50% -10%, rgba(46,123,196,.22) 0%, rgba(3,7,14,0) 62%);
+  --grad-fade:    linear-gradient(180deg, rgba(3,7,14,0) 0%, var(--abyss) 100%);
+
+  /* --- type ------------------------------------------------------------- */
+  --display: "Instrument Serif", "Times New Roman", serif;
+  --sans:    "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono:    "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --step--1: clamp(.72rem, .68rem + .12vw, .78rem);
+  --step-0:  clamp(.95rem, .90rem + .22vw, 1.06rem);
+  --step-1:  clamp(1.15rem, 1.05rem + .45vw, 1.4rem);
+  --step-2:  clamp(1.5rem, 1.25rem + 1.1vw, 2.2rem);
+  --step-3:  clamp(2.1rem, 1.5rem + 2.6vw, 4rem);
+  --step-4:  clamp(3rem, 1.6rem + 6vw, 8rem);
+  --step-5:  clamp(3.6rem, 1.4rem + 9.5vw, 12rem);
+
+  /* --- rhythm ----------------------------------------------------------- */
+  --gutter:  clamp(1.15rem, 4vw, 3.5rem);
+  --measure: 62ch;
+  --band:    clamp(4.5rem, 11vh, 9rem);
+  --shell:   1480px;
+}
+
+/* ---------------------------------------------------------------- base --- */
+*,*::before,*::after{ box-sizing:border-box }
+html{ -webkit-text-size-adjust:100% }
+body{
+  margin:0; background:var(--abyss); color:var(--ice);
+  font-family:var(--sans); font-size:var(--step-0); line-height:1.55;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+img,svg,video{ display:block; max-width:100% }
+a{ color:inherit; text-decoration:none }
+button,input,select,textarea{ font:inherit; color:inherit }
+:focus-visible{ outline:2px solid var(--electric); outline-offset:3px }
+::selection{ background:var(--pacific); color:var(--ice) }
+
+/* ------------------------------------------------------------- layout --- */
+.shell{ width:min(var(--shell), 100% - (var(--gutter) * 2)); margin-inline:auto }
+.band{ padding-block:var(--band); position:relative }
+.band--deep{ background:var(--deep) }
+.band--tight{ padding-block:calc(var(--band) * .62) }
+.rule{ height:1px; background:var(--hairline); border:0; margin:0 }
+
+/* The hairline column grid is part of the identity: it sits behind
+   everything at low contrast and never moves. */
+.gridlines{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  width:min(var(--shell), 100% - (var(--gutter) * 2)); margin-inline:auto;
+  display:grid; grid-template-columns:repeat(4, 1fr);
+}
+.gridlines span{ border-left:1px solid var(--hairline-2) }
+.gridlines span:last-child{ border-right:1px solid var(--hairline-2) }
+@media (width >= 1100px){ .gridlines{ grid-template-columns:repeat(12, 1fr) } }
+main,header,footer{ position:relative; z-index:1 }
+
+/* --------------------------------------------------------- microtype --- */
+.mono{ font-family:var(--mono); font-weight:400 }
+.tag{
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.2em;
+  text-transform:uppercase; color:var(--fog); margin:0;
+}
+.tag--accent{ color:var(--electric) }
+.num{
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.16em;
+  color:var(--electric); font-variant-numeric:tabular-nums;
+}
+.coord{
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.18em;
+  text-transform:uppercase; color:var(--fog);
+}
+
+/* -------------------------------------------------------------- type --- */
+.display{
+  font-family:var(--display); font-weight:400; line-height:.92;
+  letter-spacing:-.01em; margin:0; text-wrap:balance;
+}
+.h-xl{ font-size:var(--step-5) }
+.h-lg{ font-size:var(--step-4) }
+.h-md{ font-size:var(--step-3) }
+.h-sm{ font-size:var(--step-2) }
+.upper{ text-transform:uppercase; letter-spacing:.02em }
+.lead{ color:var(--fog); max-width:var(--measure); font-size:var(--step-1); margin:0 }
+.body{ color:var(--ice-dim); max-width:var(--measure); margin:0 }
+.stack > * + *{ margin-top:1.1rem }
+.stack-lg > * + *{ margin-top:2.4rem }
+
+/* ------------------------------------------------------------ navbar --- */
+.nav{
+  position:fixed; inset:0 0 auto; z-index:60;
+  transition:background .5s ease, border-color .5s ease, backdrop-filter .5s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.is-solid{
+  background:rgba(3,7,14,.86); border-bottom-color:var(--hairline);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+}
+.nav__in{
+  width:min(var(--shell), 100% - (var(--gutter) * 2)); margin-inline:auto;
+  display:flex; align-items:center; justify-content:space-between; gap:1rem;
+  padding-block:1rem;
+}
+.nav__brand{
+  font-family:var(--mono); font-weight:500; font-size:var(--step-0);
+  letter-spacing:.34em; text-transform:uppercase; color:var(--ice);
+}
+.nav__right{ display:flex; align-items:center; gap:clamp(1rem,2.5vw,2.4rem) }
+.nav__links{ display:flex; gap:clamp(1rem,2vw,2rem); list-style:none; margin:0; padding:0 }
+.nav__links a{
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.16em;
+  text-transform:uppercase; color:var(--fog); padding-block:.35rem;
+  border-bottom:1px solid transparent; transition:color .3s, border-color .3s;
+}
+.nav__links a:hover, .nav__links a[aria-current="true"]{
+  color:var(--ice); border-bottom-color:var(--electric);
+}
+.nav__toggle{
+  display:none; background:none; border:0; cursor:pointer; padding:.4rem 0;
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ice);
+}
+
+/* language selector — minimal, no chrome */
+.lang{ position:relative }
+.lang__btn{
+  background:none; border:1px solid var(--hairline); cursor:pointer;
+  padding:.42rem .8rem; font-family:var(--mono); font-size:var(--step--1);
+  letter-spacing:.14em; color:var(--ice); transition:border-color .3s;
+}
+.lang__btn:hover{ border-color:var(--electric) }
+.lang__menu{
+  position:absolute; right:0; top:calc(100% + .5rem); min-width:9.5rem;
+  background:var(--deep); border:1px solid var(--hairline); padding:.3rem;
+  display:none; z-index:70;
+}
+.lang.is-open .lang__menu{ display:block }
+.lang__menu a{
+  display:flex; justify-content:space-between; gap:1rem; padding:.5rem .7rem;
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.1em;
+  color:var(--fog); transition:background .2s, color .2s;
+}
+.lang__menu a:hover, .lang__menu a[aria-current="true"]{ background:rgba(46,123,196,.18); color:var(--ice) }
+
+/* mobile fullscreen menu */
+.menu{
+  position:fixed; inset:0; z-index:65; background:var(--abyss);
+  display:none; flex-direction:column; padding:var(--gutter);
+}
+.menu.is-open{ display:flex }
+.menu__head{ display:flex; align-items:center; justify-content:space-between }
+.menu__list{ list-style:none; margin:auto 0; padding:0; display:grid; gap:.4rem }
+.menu__list a{
+  font-family:var(--display); font-size:var(--step-3); text-transform:uppercase;
+  color:var(--ice); display:flex; align-items:baseline; gap:1rem;
+}
+.menu__list .num{ font-size:var(--step--1) }
+@media (width < 1024px){
+  .nav__links{ display:none }
+  .nav__toggle{ display:block }
+}
+
+/* ============================ 01 — CINEMATIC INTRO ====================== */
+/* The slot is a container. Its static content is the fallback and reads
+   perfectly on its own; an animation module may take the stage later. */
+.intro{
+  position:relative; min-height:100svh; display:grid; align-content:center;
+  background:var(--grad-depth); overflow:hidden;
+}
+.intro::after{ content:""; position:absolute; inset:0; background:var(--grad-surface); pointer-events:none }
+.intro__in{ position:relative; z-index:2; padding-block:8rem 5rem }
+.intro__coord{ display:flex; gap:1.2rem; align-items:center; margin:0 0 clamp(2rem,6vh,4rem) }
+.intro__coord i{ display:block; width:clamp(28px,6vw,64px); height:1px; background:var(--electric); font-style:normal }
+.intro__brand{
+  font-family:var(--display); font-size:var(--step-5); line-height:.86;
+  letter-spacing:.06em; text-transform:uppercase; margin:0; color:var(--ice);
+}
+.intro__line{
+  font-family:var(--display); font-size:var(--step-3); line-height:1.02;
+  text-transform:uppercase; letter-spacing:.01em; color:var(--fog);
+  margin:clamp(1.6rem,4vh,3rem) 0 0; max-width:18ch;
+}
+.intro__line b{ color:var(--ice); font-weight:400 }
+.intro__foot{
+  position:absolute; inset:auto 0 0; z-index:2; padding-block:1.6rem;
+  display:flex; align-items:center; justify-content:space-between; gap:1rem;
+}
+.intro__scroll{ display:flex; align-items:center; gap:.7rem }
+.intro__scroll i{ display:block; width:44px; height:1px; background:var(--fog); font-style:normal }
+
+/* ============================ 02 — OCEAN TRANSITION ==================== */
+.ocean{
+  position:relative; min-height:78svh; display:grid; align-content:center;
+  background:linear-gradient(180deg, var(--deep) 0%, #04101C 60%, var(--abyss) 100%);
+  overflow:hidden;
+}
+.ocean__in{ position:relative; z-index:2 }
+.ocean__grid{
+  display:grid; gap:clamp(2rem,5vw,5rem); align-items:end;
+  grid-template-columns:1fr;
+}
+@media (width >= 900px){ .ocean__grid{ grid-template-columns:5fr 6fr } }
+.ocean__title{ color:var(--ice) }
+
+/* ============================== ABOUT ================================== */
+.about__grid{ display:grid; gap:clamp(2rem,5vw,5rem); grid-template-columns:1fr }
+@media (width >= 900px){ .about__grid{ grid-template-columns:4fr 7fr } }
+.about__meta{ display:grid; gap:.9rem; align-content:start }
+
+/* ============================ 03 — PRODUCTS ============================ */
+/* Editorial, one species at a time — deliberately not a grid of cards. */
+.products__head{ display:grid; gap:1.2rem; margin-bottom:clamp(2.5rem,7vh,5rem) }
+.product{
+  border-top:1px solid var(--hairline); padding-block:clamp(2.5rem,7vh,5.5rem);
+  display:grid; gap:clamp(1.5rem,4vw,4rem); grid-template-columns:1fr;
+  align-items:center;
+}
+@media (width >= 900px){
+  .product{ grid-template-columns:1fr 1fr }
+  .product:nth-child(even) .product__media{ order:2 }
+}
+.product__num{ display:flex; align-items:baseline; gap:.9rem; margin-bottom:1rem }
+.product__name{
+  font-family:var(--display); font-size:var(--step-4); line-height:.9;
+  text-transform:uppercase; margin:0 0 .4rem; color:var(--ice);
+}
+.product__trade{ font-family:var(--mono); font-size:var(--step--1); letter-spacing:.14em; color:var(--fog); margin:0 }
+.product__bino{ font-family:var(--mono); font-style:italic; font-size:var(--step--1); color:var(--electric); margin:.35rem 0 0 }
+.product__cta{
+  display:inline-flex; align-items:center; gap:.8rem; margin-top:1.8rem;
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ice); border-bottom:1px solid var(--hairline);
+  padding-bottom:.4rem; transition:border-color .3s, color .3s;
+}
+.product__cta:hover{ border-bottom-color:var(--electric); color:var(--electric) }
+.product__cta i{ font-style:normal; transition:transform .3s }
+.product__cta:hover i{ transform:translateX(5px) }
+.product__media{ position:relative; aspect-ratio:4/3; background:var(--deep); overflow:hidden }
+.product__media img{ width:100%; height:100%; object-fit:cover }
+.product__media--empty{ display:grid; place-content:center; border:1px solid var(--hairline) }
+
+/* ============================ 04 — PROCESS ============================= */
+.stages{ display:grid; gap:0; margin-top:clamp(2rem,6vh,4rem) }
+.stage{
+  display:grid; gap:.4rem 2rem; padding-block:clamp(1.2rem,3vh,2rem);
+  border-top:1px solid var(--hairline); grid-template-columns:auto 1fr;
+  align-items:baseline;
+}
+@media (width >= 800px){ .stage{ grid-template-columns:5rem 15rem 1fr } }
+.stage__t{ font-size:var(--step-1); color:var(--ice); margin:0; text-transform:uppercase; letter-spacing:.04em }
+.stage__b{ color:var(--fog); margin:0; grid-column:1 / -1 }
+@media (width >= 800px){ .stage__b{ grid-column:3 } }
+
+/* ==================== QUALITY / TRACEABILITY (shared) ================== */
+.pairs{ display:grid; gap:0; margin-top:clamp(2rem,6vh,4rem) }
+.pair{
+  display:grid; gap:.5rem 2rem; padding-block:clamp(1.2rem,3vh,1.9rem);
+  border-top:1px solid var(--hairline); grid-template-columns:1fr;
+}
+@media (width >= 800px){ .pair{ grid-template-columns:1fr 2fr } }
+.pair__t{ margin:0; font-size:var(--step-1); color:var(--ice); text-transform:uppercase; letter-spacing:.04em }
+.pair__b{ margin:0; color:var(--fog) }
+
+/* ============================ 05 — GLOBAL REACH ======================== */
+.reach__grid{ display:grid; gap:clamp(2rem,5vw,4rem); grid-template-columns:1fr }
+@media (width >= 900px){ .reach__grid{ grid-template-columns:5fr 7fr } }
+.reach__map{
+  position:relative; aspect-ratio:16/10; border:1px solid var(--hairline);
+  background:linear-gradient(180deg, rgba(14,76,146,.10), rgba(3,7,14,0));
+  display:grid; place-content:center;
+}
+.reach__list{ list-style:none; margin:0; padding:0; display:grid }
+.reach__list li{
+  border-top:1px solid var(--hairline); padding-block:.9rem;
+  display:flex; justify-content:space-between; align-items:baseline; gap:1rem;
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.12em;
+  text-transform:uppercase; color:var(--fog);
+}
+.reach__list li b{ color:var(--ice); font-weight:400 }
+
+/* ============================== FINAL ================================== */
+.final{
+  position:relative; min-height:72svh; display:grid; align-content:center;
+  background:linear-gradient(180deg, var(--abyss), #051325 55%, var(--abyss));
+  overflow:hidden; text-align:center;
+}
+.final__line{
+  font-family:var(--display); font-size:var(--step-4); line-height:.98;
+  text-transform:uppercase; margin:0; color:var(--ice);
+}
+.final__line span{ color:var(--fog) }
+
+/* ============================== CONTACT ================================ */
+.contact__grid{ display:grid; gap:clamp(2rem,5vw,4.5rem); grid-template-columns:1fr }
+@media (width >= 950px){ .contact__grid{ grid-template-columns:6fr 5fr } }
+.form{ display:grid; gap:1.4rem }
+.form__row{ display:grid; gap:1.4rem; grid-template-columns:1fr }
+@media (width >= 620px){ .form__row{ grid-template-columns:1fr 1fr } }
+.field{ display:grid; gap:.45rem }
+.field label{
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.16em;
+  text-transform:uppercase; color:var(--fog);
+}
+.field input, .field select, .field textarea{
+  background:transparent; border:0; border-bottom:1px solid var(--hairline);
+  padding:.65rem 0; color:var(--ice); font-size:var(--step-0);
+  transition:border-color .3s;
+}
+.field textarea{ resize:vertical; min-height:6.5rem }
+.field select{ cursor:pointer }
+.field select option{ background:var(--deep); color:var(--ice) }
+.field input:focus, .field select:focus, .field textarea:focus{
+  outline:none; border-bottom-color:var(--electric);
+}
+.submit{
+  justify-self:start; margin-top:.6rem; cursor:pointer;
+  background:var(--ice); color:var(--abyss); border:1px solid var(--ice);
+  padding:.95rem 2rem; font-family:var(--mono); font-size:var(--step--1);
+  letter-spacing:.18em; text-transform:uppercase;
+  transition:background .3s, color .3s, border-color .3s;
+}
+.submit:hover{ background:transparent; color:var(--ice); border-color:var(--electric) }
+.direct{ display:grid; align-content:start; gap:0 }
+.direct__row{
+  border-top:1px solid var(--hairline); padding-block:.95rem;
+  display:flex; justify-content:space-between; gap:1.2rem; align-items:baseline;
+}
+.direct__k{ font-family:var(--mono); font-size:var(--step--1); letter-spacing:.14em; text-transform:uppercase; color:var(--fog); white-space:nowrap }
+.direct__v{ text-align:right; font-size:var(--step--1) }
+.direct__v a{ border-bottom:1px solid var(--hairline) }
+.direct__v a:hover{ border-bottom-color:var(--electric) }
+
+/* =============================== FOOTER ================================ */
+.foot{ background:var(--deep); padding-block:clamp(3rem,8vh,5rem) }
+.foot__grid{ display:grid; gap:2.5rem; grid-template-columns:1fr }
+@media (width >= 800px){ .foot__grid{ grid-template-columns:2fr 1fr 1fr } }
+.foot__brand{ font-family:var(--mono); letter-spacing:.34em; text-transform:uppercase; font-size:var(--step-0); margin:0 0 1rem }
+.foot__tag{ font-family:var(--display); font-size:var(--step-2); text-transform:uppercase; line-height:1; margin:0; color:var(--fog) }
+.foot__tag b{ color:var(--ice); font-weight:400 }
+.foot__col h3{ font-family:var(--mono); font-size:var(--step--1); letter-spacing:.18em; text-transform:uppercase; color:var(--fog); margin:0 0 1rem; font-weight:400 }
+.foot__col ul{ list-style:none; margin:0; padding:0; display:grid; gap:.5rem }
+.foot__col a{ font-size:var(--step--1); color:var(--ice-dim) }
+.foot__col a:hover{ color:var(--ice) }
+.foot__base{
+  margin-top:clamp(2.5rem,6vh,4rem); padding-top:1.4rem; border-top:1px solid var(--hairline);
+  display:flex; flex-wrap:wrap; gap:.8rem 1.5rem; justify-content:space-between;
+  font-family:var(--mono); font-size:var(--step--1); letter-spacing:.1em; color:var(--fog);
+}
+
+/* ========================= ANIMATION SLOTS ============================= */
+/* A slot never holds content the page depends on. It is an empty, sized
+   stage layered *behind* its section's static content. An animation module
+   registers into it later; with none registered, nothing renders and the
+   section is unaffected. */
+.slot{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden }
+.slot canvas, .slot video, .slot svg, .slot iframe{ width:100%; height:100%; object-fit:cover; display:block }
+[data-anim-slot]{ position:relative }
+[data-anim-slot] > .shell,
+[data-anim-slot] > .intro__in,
+[data-anim-slot] > .intro__foot{ position:relative; z-index:2 }
+
+/* ============================ PRODUCT PAGE ============================= */
+.phero{
+  position:relative; min-height:62svh; display:grid; align-content:end;
+  background:var(--grad-depth); padding-block:9rem var(--band); overflow:hidden;
+}
+.phero__name{ font-family:var(--display); font-size:var(--step-5); line-height:.86; text-transform:uppercase; margin:.6rem 0 0 }
+.pgrid{ display:grid; gap:clamp(1.6rem,4vw,3.5rem); grid-template-columns:1fr }
+@media (width >= 850px){ .pgrid{ grid-template-columns:1fr 1fr } }
+.spec{ display:grid; margin-top:clamp(1.5rem,4vh,2.5rem) }
+.spec__row{
+  border-top:1px solid var(--hairline); padding-block:.85rem;
+  display:flex; justify-content:space-between; gap:1.2rem; align-items:baseline;
+}
+.spec__k{ font-family:var(--mono); font-size:var(--step--1); letter-spacing:.14em; text-transform:uppercase; color:var(--fog); white-space:nowrap }
+.spec__v{ text-align:right; font-size:var(--step--1) }
+.editable{
+  font-family:var(--mono); font-size:var(--step--1); color:var(--electric);
+  border-bottom:1px dashed rgba(59,224,230,.45);
+}
+.gallery{ display:grid; gap:1px; background:var(--hairline); margin-top:clamp(1.5rem,4vh,2.5rem); grid-template-columns:repeat(2,1fr) }
+@media (width >= 700px){ .gallery{ grid-template-columns:repeat(4,1fr) } }
+.gallery div{ aspect-ratio:1; background:var(--deep); display:grid; place-content:center }
+
+/* ============================== MOTION ================================= */
+/* Reveals are opt-in from script, so with JS off nothing is stranded. */
+.js-rise{ opacity:0; transform:translateY(20px);
+  transition:opacity .8s cubic-bezier(.22,.7,.28,1), transform .8s cubic-bezier(.22,.7,.28,1) }
+.js-rise.is-in{ opacity:1; transform:none }
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important }
+  .js-rise{ opacity:1 !important; transform:none !important }
+  html{ scroll-behavior:auto }
+}
+@media (prefers-reduced-motion: no-preference){ html{ scroll-behavior:smooth } }
+
+.visually-hidden{
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap;
+}
+
+/* A stage slot occupies nothing until an animation module mounts into it,
+   so the page is complete with none of them integrated. */
+.anim-stage{ height:0; overflow:hidden; position:relative }
+.anim-stage.is-live{ height:clamp(46svh, 60svh, 70svh); margin-block:clamp(2rem,6vh,4rem) }
+
+/* product media: a real frame when a high-resolution photograph exists,
+   otherwise the reference thumbnail at its native size, plainly labelled. */
+.product__media--ref{ display:grid; place-content:center; gap:.9rem; border:1px solid var(--hairline) }
+.product__media--ref img{ width:200px; height:200px; object-fit:cover }
+.product__media--ref .tag{ text-align:center }
