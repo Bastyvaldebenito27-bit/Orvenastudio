@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MERLUZA GAYI — INSIDUS</title>
+<meta name="description" content="MERLUZA GAYI (South Pacific Hake, Merluccius gayi). South Pacific species processed for export by INSIDUS.">
+<meta property="og:site_name" content="INSIDUS">
+<meta name="theme-color" content="#03070E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap">
+<link rel="stylesheet" href="/assets/css/insidus.css">
+
+</head>
+<body data-page="product" data-product="merluza-gayi">
+
+<div class="gridlines" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<header class="nav" id="nav">
+  <div class="nav__in">
+    <a class="nav__brand" href="/">INSIDUS</a>
+    <div class="nav__right">
+      <nav aria-label="Main"><ul class="nav__links" id="nav-links"></ul></nav>
+      <div class="lang" id="lang">
+        <button class="lang__btn" id="lang-btn" type="button" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="lang__menu" id="lang-menu" role="menu"></div>
+      </div>
+      <button class="nav__toggle" id="menu-open" type="button" aria-expanded="false" aria-controls="menu"></button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu">
+  <div class="menu__head">
+    <span class="nav__brand">INSIDUS</span>
+    <button class="nav__toggle" id="menu-close" type="button" style="display:block"></button>
+  </div>
+  <nav aria-label="Mobile"><ul class="menu__list" id="menu-list"></ul></nav>
+</div>
+
+<main>
+<section class="phero" id="phero">
+  <div class="slot" aria-hidden="true"></div>
+  <div class="shell">
+    <p class="coord"><span class="num" id="p-num"></span> &nbsp;<span id="p-index"></span></p>
+    <h1 class="phero__name" id="p-name"></h1>
+    <p class="product__trade" id="p-trade" style="margin-top:1rem"></p>
+    <p class="product__bino" id="p-bino"></p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="shell">
+    <div class="pgrid">
+      <div>
+        <p class="tag tag--accent" id="ps-overview"></p>
+        <div class="spec" id="p-spec"></div>
+      </div>
+      <div class="stack">
+        <p class="tag" id="ps-origin"></p>
+        <p class="body"><span class="editable" data-editable>—</span></p>
+        <p class="tag" id="ps-processing" style="margin-top:2rem"></p>
+        <p class="body"><span class="editable" data-editable>—</span></p>
+        <p class="tag" id="ps-quality" style="margin-top:2rem"></p>
+        <p class="body"><span class="editable" data-editable>—</span></p>
+        <p class="tag" id="ps-markets" style="margin-top:2rem"></p>
+        <p class="body"><span class="editable" data-editable>—</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band band--deep">
+  <div class="shell">
+    <p class="tag" id="ps-gallery"></p>
+    <div class="gallery">
+      <div><span class="coord">01</span></div><div><span class="coord">02</span></div>
+      <div><span class="coord">03</span></div><div><span class="coord">04</span></div>
+    </div>
+    <p class="tag" id="p-gallery-note" style="margin-top:1rem"></p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="shell" style="display:flex;justify-content:space-between;gap:1.5rem;flex-wrap:wrap">
+    <a class="product__cta" id="p-back" href="../../"></a>
+    <span id="p-next"></span>
+  </div>
+</section>
+</main>
+
+<section class="band" id="contact">
+  <div class="shell">
+    <p class="tag" id="contact-kicker"></p>
+    <h2 class="display h-md upper" id="contact-title" style="margin:.6rem 0 1rem"></h2>
+    <p class="lead" id="contact-lead" style="margin-bottom:clamp(2rem,5vh,3.5rem)"></p>
+    <div class="contact__grid">
+      <form class="form" id="contact-form" novalidate>
+        <div class="form__row">
+          <div class="field"><label for="f-name"></label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+          <div class="field"><label for="f-company"></label><input id="f-company" name="company" type="text" autocomplete="organization"></div>
+        </div>
+        <div class="form__row">
+          <div class="field"><label for="f-country"></label><input id="f-country" name="country" type="text" autocomplete="country-name"></div>
+          <div class="field"><label for="f-email"></label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+        </div>
+        <div class="field"><label for="f-interest"></label><select id="f-interest" name="interest"></select></div>
+        <div class="field"><label for="f-message"></label><textarea id="f-message" name="message" rows="4"></textarea></div>
+        <button class="submit" id="f-submit" type="submit"></button>
+      </form>
+      <div class="direct">
+        <h3 class="tag" id="direct-title" style="margin-bottom:.6rem"></h3>
+        <div id="direct-rows"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="shell">
+    <div class="foot__grid">
+      <div>
+        <p class="foot__brand">INSIDUS</p>
+        <p class="foot__tag" id="foot-tag"></p>
+      </div>
+      <div class="foot__col"><h3 id="foot-nav-title"></h3><ul id="foot-nav"></ul></div>
+      <div class="foot__col"><h3 id="foot-lang-title"></h3><ul id="foot-langs"></ul></div>
+    </div>
+    <div class="foot__base"><span id="foot-base"></span><span class="mono">CHILE · SOUTH PACIFIC</span></div>
+  </div>
+</footer>
+
+<script>window.INSIDUS_CONFIG={"langs": ["es", "en", "zh", "fr", "it", "de", "pt", "ja", "ko"], "label": {"es": "ES", "en": "EN", "zh": "中文", "fr": "FR", "it": "IT", "de": "DE", "pt": "PT", "ja": "日本語", "ko": "한국어"}, "htmlLang": {"es": "es", "en": "en", "zh": "zh-Hans", "fr": "fr", "it": "it", "de": "de", "pt": "pt", "ja": "ja", "ko": "ko"}, "species": [{"slug": "jibia", "n": "01", "name": "JIBIA", "trade": "Jumbo Squid", "bino": "Dosidicus gigas"}, {"slug": "bacalao", "n": "02", "name": "BACALAO", "trade": "Chilean Seabass", "bino": "Dissostichus eleginoides"}, {"slug": "pez-espada", "n": "03", "name": "PEZ ESPADA", "trade": "Swordfish", "bino": "Xiphias gladius"}, {"slug": "merluza-austral", "n": "04", "name": "MERLUZA AUSTRAL", "trade": "Southern Hake", "bino": "Merluccius australis"}, {"slug": "merluza-gayi", "n": "05", "name": "MERLUZA GAYI", "trade": "South Pacific Hake", "bino": "Merluccius gayi"}, {"slug": "reineta", "n": "06", "name": "REINETA", "trade": "Pacific Pomfret", "bino": "Brama australis"}, {"slug": "jaiba", "n": "07", "name": "JAIBA", "trade": "Rock Crab", "bino": "Cancer spp."}, {"slug": "locos", "n": "08", "name": "LOCOS", "trade": "Chilean Abalone", "bino": "Concholepas concholepas"}], "facts": {"email": "mbonilla@valrey.cl", "phone": "+56 9 7637 9609", "address": "Av. Bernardo O'Higgins 2929, San Antonio, Valparaíso, Chile", "originLabel": "Chile · South Pacific"}, "photos": {"bacalao": "/assets/img/bacalao-hi.jpg"}, "thumbs": {"jibia": "/assets/img/calamar.jpg", "bacalao": "/assets/img/bacalao.jpg", "pez-espada": "/assets/img/albacora.jpg", "merluza-austral": "/assets/img/merluza-austral.jpg", "merluza-gayi": "/assets/img/merluza-gayi.jpg", "reineta": "/assets/img/reineta.jpg", "jaiba": "/assets/img/jaiba.jpg", "locos": "/assets/img/locos.jpg"}, "base": "/"};</script>
+<script src="/assets/js/insidus.js" defer></script>
+</body>
+</html>

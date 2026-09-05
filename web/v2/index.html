@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INSIDUS — From the Chilean Pacific to the world</title>
+<meta name="description" content="Seafood export from Chile. Jumbo squid, Chilean seabass, swordfish, hake, pomfret, rock crab and abalone.">
+<meta property="og:site_name" content="INSIDUS">
+<meta name="theme-color" content="#03070E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap">
+<link rel="stylesheet" href="/assets/css/insidus.css">
+
+</head>
+<body data-page="home">
+
+<div class="gridlines" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<header class="nav" id="nav">
+  <div class="nav__in">
+    <a class="nav__brand" href="/">INSIDUS</a>
+    <div class="nav__right">
+      <nav aria-label="Main"><ul class="nav__links" id="nav-links"></ul></nav>
+      <div class="lang" id="lang">
+        <button class="lang__btn" id="lang-btn" type="button" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="lang__menu" id="lang-menu" role="menu"></div>
+      </div>
+      <button class="nav__toggle" id="menu-open" type="button" aria-expanded="false" aria-controls="menu"></button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu">
+  <div class="menu__head">
+    <span class="nav__brand">INSIDUS</span>
+    <button class="nav__toggle" id="menu-close" type="button" style="display:block"></button>
+  </div>
+  <nav aria-label="Mobile"><ul class="menu__list" id="menu-list"></ul></nav>
+</div>
+
+<main>
+
+<!-- 01 ................................................. CINEMATIC INTRO -->
+<section class="intro" id="cinematic-intro" data-anim-slot="CinematicIntro">
+  <div class="slot" aria-hidden="true"></div>
+  <div class="intro__in">
+    <div class="shell">
+      <p class="intro__coord coord"><i></i><span id="intro-coord"></span></p>
+      <h1 class="intro__brand">INSIDUS</h1>
+      <p class="intro__line" id="intro-line"></p>
+    </div>
+  </div>
+  <div class="intro__foot">
+    <div class="shell" style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
+      <span class="intro__scroll coord"><i></i><span id="intro-scroll"></span></span>
+      <span class="coord">33°35′S · 71°37′W</span>
+    </div>
+  </div>
+</section>
+
+<!-- 02 ............................................... OCEAN TRANSITION -->
+<section class="ocean" id="ocean-transition" data-anim-slot="OceanTransition">
+  <div class="slot" aria-hidden="true"></div>
+  <div class="shell ocean__in">
+    <div class="ocean__grid">
+      <div>
+        <p class="tag tag--accent" id="ocean-kicker"></p>
+        <h2 class="display h-md upper ocean__title" id="ocean-title" style="margin-top:.8rem"></h2>
+      </div>
+      <p class="body" id="ocean-body"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ............................................................. ABOUT -->
+<section class="band" id="about">
+  <div class="shell">
+    <div class="about__grid">
+      <div class="about__meta">
+        <p class="tag" id="about-kicker"></p>
+        <h2 class="display h-lg upper" id="about-title"></h2>
+        <p class="lead" id="about-lead"></p>
+      </div>
+      <div class="stack" id="about-body"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ......................................................... PRODUCTS -->
+<section class="band band--deep" id="products">
+  <div class="shell">
+    <div class="products__head">
+      <p class="tag tag--accent" id="products-kicker"></p>
+      <h2 class="display h-lg upper" id="products-title"></h2>
+      <p class="lead" id="products-lead"></p>
+    </div>
+  </div>
+  <div class="anim-stage" id="product-animation" data-anim-slot="ProductAnimation">
+    <div class="slot" aria-hidden="true"></div>
+  </div>
+  <div class="shell" id="products-list"></div>
+</section>
+
+<!-- 04 .......................................................... PROCESS -->
+<section class="band" id="process">
+  <div class="shell">
+    <p class="tag" id="process-kicker"></p>
+    <h2 class="display h-lg upper" id="process-title" style="margin:.8rem 0 1rem"></h2>
+    <p class="lead" id="process-lead"></p>
+  </div>
+  <div class="anim-stage" id="process-animation" data-anim-slot="ProcessAnimation">
+    <div class="slot" aria-hidden="true"></div>
+  </div>
+  <div class="shell"><div class="stages" id="process-list"></div></div>
+</section>
+
+<!-- ........................................................... QUALITY -->
+<section class="band band--deep" id="quality">
+  <div class="shell">
+    <p class="tag tag--accent" id="quality-kicker"></p>
+    <h2 class="display h-lg upper" id="quality-title" style="margin:.8rem 0 1rem"></h2>
+    <p class="lead" id="quality-lead"></p>
+    <div class="pairs" id="quality-list"></div>
+  </div>
+</section>
+
+<!-- ...................................................... TRACEABILITY -->
+<section class="band" id="traceability">
+  <div class="shell">
+    <p class="tag" id="trace-kicker"></p>
+    <h2 class="display h-md upper" id="trace-title" style="margin:.8rem 0 1rem"></h2>
+    <p class="lead" id="trace-lead"></p>
+    <div class="pairs" id="trace-list"></div>
+  </div>
+</section>
+
+<!-- ...................................................... GLOBAL REACH -->
+<section class="band band--deep" id="global">
+  <div class="shell">
+    <p class="tag" id="reach-kicker"></p>
+    <h2 class="display h-lg upper" id="reach-title" style="margin:.8rem 0 1rem"></h2>
+    <p class="lead" id="reach-lead" style="margin-bottom:clamp(2rem,5vh,3.5rem)"></p>
+    <div class="reach__grid">
+      <div>
+        <ul class="reach__list" id="reach-list"></ul>
+        <p class="tag" id="reach-note" style="margin-top:1.4rem"></p>
+      </div>
+      <!-- Map stage: an SVG, Three.js globe or WebGL layer mounts here later. -->
+      <div class="reach__map" id="global-map" data-anim-slot="GlobalMap">
+        <div class="slot" aria-hidden="true"></div>
+        <span class="coord" id="reach-maplabel"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 ..................................................... FINAL MOMENT -->
+<section class="final" id="final-animation" data-anim-slot="FinalAnimation">
+  <div class="slot" aria-hidden="true"></div>
+  <div class="shell">
+    <p class="final__line display" id="final-line"></p>
+    <a class="product__cta" id="final-cta" href="#contact" style="margin-top:2.5rem"></a>
+  </div>
+</section>
+
+</main>
+
+<section class="band" id="contact">
+  <div class="shell">
+    <p class="tag" id="contact-kicker"></p>
+    <h2 class="display h-md upper" id="contact-title" style="margin:.6rem 0 1rem"></h2>
+    <p class="lead" id="contact-lead" style="margin-bottom:clamp(2rem,5vh,3.5rem)"></p>
+    <div class="contact__grid">
+      <form class="form" id="contact-form" novalidate>
+        <div class="form__row">
+          <div class="field"><label for="f-name"></label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+          <div class="field"><label for="f-company"></label><input id="f-company" name="company" type="text" autocomplete="organization"></div>
+        </div>
+        <div class="form__row">
+          <div class="field"><label for="f-country"></label><input id="f-country" name="country" type="text" autocomplete="country-name"></div>
+          <div class="field"><label for="f-email"></label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+        </div>
+        <div class="field"><label for="f-interest"></label><select id="f-interest" name="interest"></select></div>
+        <div class="field"><label for="f-message"></label><textarea id="f-message" name="message" rows="4"></textarea></div>
+        <button class="submit" id="f-submit" type="submit"></button>
+      </form>
+      <div class="direct">
+        <h3 class="tag" id="direct-title" style="margin-bottom:.6rem"></h3>
+        <div id="direct-rows"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="shell">
+    <div class="foot__grid">
+      <div>
+        <p class="foot__brand">INSIDUS</p>
+        <p class="foot__tag" id="foot-tag"></p>
+      </div>
+      <div class="foot__col"><h3 id="foot-nav-title"></h3><ul id="foot-nav"></ul></div>
+      <div class="foot__col"><h3 id="foot-lang-title"></h3><ul id="foot-langs"></ul></div>
+    </div>
+    <div class="foot__base"><span id="foot-base"></span><span class="mono">CHILE · SOUTH PACIFIC</span></div>
+  </div>
+</footer>
+
+<script>window.INSIDUS_CONFIG={"langs": ["es", "en", "zh", "fr", "it", "de", "pt", "ja", "ko"], "label": {"es": "ES", "en": "EN", "zh": "中文", "fr": "FR", "it": "IT", "de": "DE", "pt": "PT", "ja": "日本語", "ko": "한국어"}, "htmlLang": {"es": "es", "en": "en", "zh": "zh-Hans", "fr": "fr", "it": "it", "de": "de", "pt": "pt", "ja": "ja", "ko": "ko"}, "species": [{"slug": "jibia", "n": "01", "name": "JIBIA", "trade": "Jumbo Squid", "bino": "Dosidicus gigas"}, {"slug": "bacalao", "n": "02", "name": "BACALAO", "trade": "Chilean Seabass", "bino": "Dissostichus eleginoides"}, {"slug": "pez-espada", "n": "03", "name": "PEZ ESPADA", "trade": "Swordfish", "bino": "Xiphias gladius"}, {"slug": "merluza-austral", "n": "04", "name": "MERLUZA AUSTRAL", "trade": "Southern Hake", "bino": "Merluccius australis"}, {"slug": "merluza-gayi", "n": "05", "name": "MERLUZA GAYI", "trade": "South Pacific Hake", "bino": "Merluccius gayi"}, {"slug": "reineta", "n": "06", "name": "REINETA", "trade": "Pacific Pomfret", "bino": "Brama australis"}, {"slug": "jaiba", "n": "07", "name": "JAIBA", "trade": "Rock Crab", "bino": "Cancer spp."}, {"slug": "locos", "n": "08", "name": "LOCOS", "trade": "Chilean Abalone", "bino": "Concholepas concholepas"}], "facts": {"email": "mbonilla@valrey.cl", "phone": "+56 9 7637 9609", "address": "Av. Bernardo O'Higgins 2929, San Antonio, Valparaíso, Chile", "originLabel": "Chile · South Pacific"}, "photos": {"bacalao": "/assets/img/bacalao-hi.jpg"}, "thumbs": {"jibia": "/assets/img/calamar.jpg", "bacalao": "/assets/img/bacalao.jpg", "pez-espada": "/assets/img/albacora.jpg", "merluza-austral": "/assets/img/merluza-austral.jpg", "merluza-gayi": "/assets/img/merluza-gayi.jpg", "reineta": "/assets/img/reineta.jpg", "jaiba": "/assets/img/jaiba.jpg", "locos": "/assets/img/locos.jpg"}, "base": "/"};</script>
+<script src="/assets/js/insidus.js" defer></script>
+</body>
+</html>

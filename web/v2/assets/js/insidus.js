@@ -1,0 +1,618 @@
+/* ============================================================================
+   INSIDUS — application
+   Content never lives in the components: every string is read from a locale
+   bundle. Animation is a registry, not a dependency — with nothing registered
+   the page is complete and static.
+   ========================================================================= */
+(function () {
+"use strict";
+
+var W = window;
+var INSIDUS = W.INSIDUS = W.INSIDUS || {};
+
+/* -------------------------------------------------------------- config -- */
+var CFG = W.INSIDUS_CONFIG || {};
+var LANGS = CFG.langs || ["es", "en"];
+var LABEL = CFG.label || {};
+var HTML_LANG = CFG.htmlLang || {};
+var SPECIES = CFG.species || [];
+var FACTS = CFG.facts || {};
+var PHOTOS = CFG.photos || {};
+var BASE = CFG.base || "/";
+var PAGE = document.body.getAttribute("data-page") || "home";
+var PRODUCT = document.body.getAttribute("data-product") || null;
+var STORE = "insidus.lang";
+var REDUCE = W.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ------------------------------------------------------------ helpers -- */
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function $(sel, root) { return (root || document).querySelector(sel); }
+function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+function setText(sel, text) { var n = $(sel); if (n) n.textContent = text; }
+function clear(sel) { var n = $(sel); if (n) n.textContent = ""; return n; }
+function fmt(s, vars) {
+  return String(s).replace(/\{(\w+)\}/g, function (_, k) {
+    return vars[k] != null ? vars[k] : "";
+  });
+}
+
+/* ------------------------------------------------------- language pick -- */
+function pickLang() {
+  try {
+    var q = new URLSearchParams(location.search).get("lang");
+    if (q && LANGS.indexOf(q) > -1) return q;
+  } catch (e) {}
+  try {
+    var s = localStorage.getItem(STORE);
+    if (s && LANGS.indexOf(s) > -1) return s;
+  } catch (e) {}
+  try {
+    var nav = (navigator.languages && navigator.languages.length)
+      ? navigator.languages : [navigator.language || "es"];
+    for (var i = 0; i < nav.length; i++) {
+      var t = String(nav[i]).toLowerCase();
+      if (t.indexOf("zh") === 0 && LANGS.indexOf("zh") > -1) return "zh";
+      var b = t.split("-")[0];
+      if (LANGS.indexOf(b) > -1) return b;
+    }
+  } catch (e) {}
+  return LANGS[0];
+}
+
+/* ------------------------------------------------------------- locales -- */
+/* Bundles may be inlined (single-file build) or fetched from /locales.
+   Either way the components only ever see a resolved dictionary. */
+var CACHE = W.INSIDUS_LOCALES || {};
+function loadLocale(lang) {
+  if (CACHE[lang]) return Promise.resolve(CACHE[lang]);
+  return fetch(BASE + "locales/" + lang + ".json", { credentials: "same-origin" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("locale " + lang + " " + r.status);
+      return r.json();
+    })
+    .then(function (d) { CACHE[lang] = d; return d; });
+}
+
+/* ----------------------------------------------------------------- SEO -- */
+function applySEO(lang, d) {
+  var html = document.documentElement;
+  html.setAttribute("lang", HTML_LANG[lang] || lang);
+
+  var title, desc;
+  if (PAGE === "product") {
+    var sp = speciesBySlug(PRODUCT) || {};
+    var vars = { name: sp.name, trade: sp.trade, bino: sp.bino };
+    title = fmt(d.meta.productTitle, vars);
+    desc = fmt(d.meta.productDesc, vars);
+  } else {
+    title = d.meta.title;
+    desc = d.meta.description;
+  }
+  document.title = title;
+  meta("name", "description", desc);
+  meta("property", "og:title", title);
+  meta("property", "og:description", desc);
+  meta("property", "og:locale", (HTML_LANG[lang] || lang).replace("-", "_"));
+  meta("property", "og:type", "website");
+  meta("name", "twitter:card", "summary_large_image");
+
+  // hreflang set, regenerated so the alternates always match the current path
+  $$("link[data-hreflang]").forEach(function (n) { n.remove(); });
+  var head = document.head;
+  var path = location.pathname;
+  LANGS.forEach(function (l) {
+    var link = document.createElement("link");
+    link.rel = "alternate";
+    link.setAttribute("hreflang", HTML_LANG[l] || l);
+    link.href = location.origin + path + "?lang=" + l;
+    link.setAttribute("data-hreflang", "");
+    head.appendChild(link);
+  });
+  var x = document.createElement("link");
+  x.rel = "alternate"; x.setAttribute("hreflang", "x-default");
+  x.href = location.origin + path;
+  x.setAttribute("data-hreflang", "");
+  head.appendChild(x);
+}
+function meta(attr, key, val) {
+  var n = document.head.querySelector("meta[" + attr + '="' + key + '"]');
+  if (!n) { n = document.createElement("meta"); n.setAttribute(attr, key); document.head.appendChild(n); }
+  n.setAttribute("content", val);
+}
+
+function speciesBySlug(slug) {
+  for (var i = 0; i < SPECIES.length; i++) if (SPECIES[i].slug === slug) return SPECIES[i];
+  return null;
+}
+
+/* ============================ COMPONENTS ================================ */
+/* Each takes the resolved dictionary; none holds copy of its own. */
+
+function Navbar(d) {
+  var host = clear("#nav-links");
+  if (host) {
+    navItems(d).forEach(function (it) {
+      var li = el("li"), a = el("a", null, it.label);
+      a.href = it.href; li.appendChild(a); host.appendChild(li);
+    });
+  }
+  var mob = clear("#menu-list");
+  if (mob) {
+    navItems(d).forEach(function (it, i) {
+      var li = el("li"), a = el("a");
+      a.href = it.href;
+      a.appendChild(el("span", "num", String(i + 1).padStart(2, "0")));
+      a.appendChild(el("span", null, it.label));
+      li.appendChild(a); mob.appendChild(li);
+    });
+  }
+  setText("#menu-open", d.nav.menu);
+  setText("#menu-close", d.nav.close);
+}
+function navItems(d) {
+  var root = PAGE === "product" ? BASE : "";
+  return [
+    { label: d.nav.products, href: root + "#products" },
+    { label: d.nav.about,    href: root + "#about" },
+    { label: d.nav.process,  href: root + "#process" },
+    { label: d.nav.quality,  href: root + "#quality" },
+    { label: d.nav.global,   href: root + "#global" },
+    { label: d.nav.contact,  href: root + "#contact" }
+  ];
+}
+
+function LanguageSwitcher(lang, d) {
+  var btn = $("#lang-btn"), menu = clear("#lang-menu");
+  if (btn) { btn.textContent = LABEL[lang] || lang; btn.setAttribute("aria-label", d.ui.langLabel); }
+  if (!menu) return;
+  LANGS.forEach(function (l) {
+    var a = el("a");
+    a.href = "?lang=" + l;
+    a.setAttribute("data-lang", l);
+    if (l === lang) a.setAttribute("aria-current", "true");
+    a.appendChild(el("span", null, LABEL[l] || l));
+    a.appendChild(el("span", "mono", l.toUpperCase()));
+    menu.appendChild(a);
+  });
+}
+
+function CinematicIntro(d) {
+  setText("#intro-coord", d.intro.coord);
+  setText("#intro-scroll", d.intro.scroll);
+  var line = clear("#intro-line");
+  if (line) {
+    line.appendChild(document.createTextNode(d.intro.line1 + " "));
+    line.appendChild(el("b", null, d.intro.line2));
+  }
+}
+
+function OceanSection(d) {
+  setText("#ocean-kicker", d.ocean.kicker);
+  setText("#ocean-title", d.ocean.title);
+  setText("#ocean-body", d.ocean.body);
+}
+
+function AboutSection(d) {
+  setText("#about-kicker", d.about.kicker);
+  setText("#about-title", d.about.title);
+  setText("#about-lead", d.about.lead);
+  var body = clear("#about-body");
+  if (body) ["p1", "p2", "p3"].forEach(function (k) {
+    body.appendChild(el("p", "body", d.about[k]));
+  });
+}
+
+function ProductShowcase(d) {
+  setText("#products-kicker", d.products.kicker);
+  setText("#products-title", d.products.title);
+  setText("#products-lead", d.products.lead);
+  var host = clear("#products-list");
+  if (!host) return;
+  SPECIES.forEach(function (s) {
+    var art = el("article", "product js-rise");
+
+    var hi = PHOTOS[s.slug], ref = (CFG.thumbs || {})[s.slug];
+    var media = el("div", "product__media" + (hi ? "" : (ref ? " product__media--ref" : " product__media--empty")));
+    if (hi || ref) {
+      var img = el("img");
+      img.src = hi || ref; img.alt = s.name + " — " + s.trade;
+      img.width = 200; img.height = 200;
+      img.loading = "lazy"; img.decoding = "async";
+      media.appendChild(img);
+      if (!hi) media.appendChild(el("span", "tag", d.prodfields.editable));
+    } else {
+      media.appendChild(el("span", "tag", d.prodfields.editable));
+    }
+
+    var info = el("div");
+    var head = el("div", "product__num");
+    head.appendChild(el("span", "num", s.n));
+    head.appendChild(el("span", "tag", d.products.index));
+    info.appendChild(head);
+    info.appendChild(el("h3", "product__name", s.name));
+    info.appendChild(el("p", "product__trade", s.trade));
+    info.appendChild(el("p", "product__bino", s.bino));
+
+    var a = el("a", "product__cta");
+    a.href = BASE + "products/" + s.slug + "/" + langQuery();
+    a.appendChild(el("span", null, d.products.view));
+    a.appendChild(el("i", null, "→"));
+    info.appendChild(a);
+
+    art.appendChild(media); art.appendChild(info);
+    host.appendChild(art);
+  });
+}
+
+function ProcessTimeline(d) {
+  setText("#process-kicker", d.process.kicker);
+  setText("#process-title", d.process.title);
+  setText("#process-lead", d.process.lead);
+  var host = clear("#process-list");
+  if (!host) return;
+  d.process.stages.forEach(function (st, i) {
+    var row = el("div", "stage js-rise");
+    row.appendChild(el("span", "num", String(i + 1).padStart(2, "0")));
+    row.appendChild(el("h3", "stage__t", st[0]));
+    row.appendChild(el("p", "stage__b", st[1]));
+    host.appendChild(row);
+  });
+}
+
+function PairsSection(prefix, block) {
+  setText("#" + prefix + "-kicker", block.kicker);
+  setText("#" + prefix + "-title", block.title);
+  setText("#" + prefix + "-lead", block.lead);
+  var host = clear("#" + prefix + "-list");
+  if (!host) return;
+  block.items.forEach(function (it) {
+    var row = el("div", "pair js-rise");
+    row.appendChild(el("h3", "pair__t", it[0]));
+    row.appendChild(el("p", "pair__b", it[1]));
+    host.appendChild(row);
+  });
+}
+
+function GlobalReach(d) {
+  setText("#reach-kicker", d.reach.kicker);
+  setText("#reach-title", d.reach.title);
+  setText("#reach-lead", d.reach.lead);
+  setText("#reach-note", d.reach.note);
+  setText("#reach-maplabel", d.reach.destinations);
+  var host = clear("#reach-list");
+  if (!host) return;
+  var origin = el("li");
+  origin.appendChild(el("span", null, d.reach.origin));
+  origin.appendChild(el("b", null, FACTS.originLabel || "Chile"));
+  host.appendChild(origin);
+  d.reach.regions.forEach(function (r) {
+    var li = el("li");
+    li.appendChild(el("span", null, r));
+    li.appendChild(el("b", "editable", d.ui.editable));
+    host.appendChild(li);
+  });
+}
+
+function FinalMoment(d) {
+  var line = clear("#final-line");
+  if (line) {
+    line.appendChild(el("span", null, d.final.line1 + " "));
+    line.appendChild(document.createTextNode(d.final.line2));
+  }
+  setText("#final-cta", d.final.cta);
+  var a = $("#final-cta");
+  if (a) a.href = "#contact";
+}
+
+function ContactForm(d) {
+  setText("#contact-kicker", d.contact.kicker);
+  setText("#contact-title", d.contact.title);
+  setText("#contact-lead", d.contact.lead);
+  ["name", "company", "country", "email", "interest", "message"].forEach(function (k) {
+    setText('label[for="f-' + k + '"]', d.contact[k]);
+  });
+  setText("#f-submit", d.contact.send);
+  setText("#direct-title", d.contact.direct);
+
+  var sel = clear("#f-interest");
+  if (sel) {
+    var any = el("option", null, d.contact.any); any.value = ""; sel.appendChild(any);
+    SPECIES.forEach(function (s) {
+      var o = el("option", null, s.name + " · " + s.trade); o.value = s.name; sel.appendChild(o);
+    });
+    if (PAGE === "product" && PRODUCT) {
+      var sp = speciesBySlug(PRODUCT);
+      if (sp) sel.value = sp.name;
+    }
+  }
+
+  var rows = clear("#direct-rows");
+  if (rows) {
+    [[d.contact.addressLabel, FACTS.address, null],
+     [d.contact.emailLabel, FACTS.email, "mailto:" + FACTS.email],
+     [d.contact.phoneLabel, FACTS.phone, "tel:" + String(FACTS.phone || "").replace(/\s/g, "")]
+    ].forEach(function (r) {
+      if (!r[1]) return;
+      var row = el("div", "direct__row");
+      row.appendChild(el("span", "direct__k", r[0]));
+      var v = el("span", "direct__v");
+      if (r[2]) { var a = el("a", null, r[1]); a.href = r[2]; v.appendChild(a); }
+      else v.textContent = r[1];
+      row.appendChild(v); rows.appendChild(row);
+    });
+  }
+}
+
+function Footer(d) {
+  var tag = clear("#foot-tag");
+  if (tag) {
+    tag.appendChild(document.createTextNode(d.footer.tagline1 + " "));
+    tag.appendChild(el("b", null, d.footer.tagline2));
+  }
+  setText("#foot-nav-title", d.footer.nav);
+  setText("#foot-lang-title", d.footer.langs);
+  setText("#foot-base", "© " + new Date().getFullYear() + " " + d.footer.legal + " · " + d.footer.rights);
+
+  var nav = clear("#foot-nav");
+  if (nav) navItems(d).forEach(function (it) {
+    var li = el("li"), a = el("a", null, it.label); a.href = it.href;
+    li.appendChild(a); nav.appendChild(li);
+  });
+  var langs = clear("#foot-langs");
+  if (langs) LANGS.forEach(function (l) {
+    var li = el("li"), a = el("a", null, LABEL[l] || l);
+    a.href = "?lang=" + l; a.setAttribute("data-lang", l);
+    li.appendChild(a); langs.appendChild(li);
+  });
+}
+
+/* ------------------------------------------------------- product page -- */
+function ProductDetail(d) {
+  var s = speciesBySlug(PRODUCT);
+  if (!s) return;
+  setText("#p-num", s.n);
+  setText("#p-index", d.products.index);
+  setText("#p-name", s.name);
+  setText("#p-trade", s.trade);
+  setText("#p-bino", s.bino);
+  setText("#p-back", d.products.all);
+  var back = $("#p-back"); if (back) back.href = BASE + langQuery();
+
+  var sections = [
+    ["overview", d.prodfields.overview],
+    ["origin", d.prodfields.origin],
+    ["formats", d.prodfields.formats],
+    ["processing", d.prodfields.processing],
+    ["quality", d.prodfields.quality],
+    ["markets", d.prodfields.markets],
+    ["gallery", d.prodfields.gallery],
+    ["inquiry", d.contact.title]
+  ];
+  sections.forEach(function (p) { setText("#ps-" + p[0], p[1]); });
+
+  var spec = clear("#p-spec");
+  if (spec) {
+    [[d.prodfields.species, s.bino, true],
+     [d.prodfields.trade, s.trade, false],
+     [d.prodfields.area, null, false],
+     [d.prodfields.season, null, false],
+     [d.prodfields.formats, null, false],
+     [d.prodfields.sizes, null, false],
+     [d.prodfields.packing, null, false],
+     [d.prodfields.markets, null, false]
+    ].forEach(function (r) {
+      var row = el("div", "spec__row");
+      row.appendChild(el("span", "spec__k", r[0]));
+      var v = el("span", "spec__v");
+      if (r[1]) { var i = el("i", null, r[1]); if (r[2]) i.style.fontStyle = "italic"; v.appendChild(i); }
+      else v.appendChild(el("span", "editable", d.ui.editable));
+      row.appendChild(v); spec.appendChild(row);
+    });
+  }
+  setText("#p-gallery-note", d.prodfields.galleryNote);
+
+  var nx = clear("#p-next");
+  if (nx) {
+    var idx = SPECIES.indexOf(s);
+    var next = SPECIES[(idx + 1) % SPECIES.length];
+    var a = el("a", "product__cta");
+    a.href = BASE + "products/" + next.slug + "/" + langQuery();
+    a.appendChild(el("span", null, d.ui.next + " · " + next.name));
+    a.appendChild(el("i", null, "→"));
+    nx.appendChild(a);
+  }
+}
+
+function langQuery() {
+  var l = INSIDUS.lang;
+  return (l && l !== LANGS[0]) ? "?lang=" + l : "";
+}
+
+/* ============================== RENDER ================================== */
+function render(lang, d) {
+  INSIDUS.lang = lang;
+  INSIDUS.dict = d;
+  applySEO(lang, d);
+  Navbar(d);
+  LanguageSwitcher(lang, d);
+  Footer(d);
+  ContactForm(d);
+  if (PAGE === "home") {
+    CinematicIntro(d);
+    OceanSection(d);
+    AboutSection(d);
+    ProductShowcase(d);
+    ProcessTimeline(d);
+    PairsSection("quality", d.quality);
+    PairsSection("trace", d.trace);
+    GlobalReach(d);
+    FinalMoment(d);
+  } else if (PAGE === "product") {
+    ProductDetail(d);
+  }
+  markRises();
+  INSIDUS.anim._mountAll();
+  document.dispatchEvent(new CustomEvent("insidus:rendered", { detail: { lang: lang, dict: d } }));
+}
+
+function setLang(lang, push) {
+  if (LANGS.indexOf(lang) < 0) return;
+  try { localStorage.setItem(STORE, lang); } catch (e) {}
+  if (push) {
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set("lang", lang);
+      history.replaceState(null, "", u.pathname + u.search + u.hash);
+    } catch (e) {}
+  }
+  loadLocale(lang).then(function (d) { render(lang, d); })
+    .catch(function (err) { console.error("[insidus]", err); });
+}
+INSIDUS.setLang = setLang;
+
+/* ====================== ANIMATION SLOT REGISTRY ========================= */
+/* Modules register by name and receive their stage element. Nothing here
+   renders content; if no module ever registers, the site is unchanged. */
+INSIDUS.anim = (function () {
+  var mods = {}, mounted = {};
+  return {
+    register: function (name, mount) {
+      mods[name] = mount;
+      this._mount(name);
+      return this;
+    },
+    slot: function (name) { return $('[data-anim-slot="' + name + '"] .slot'); },
+    section: function (name) { return $('[data-anim-slot="' + name + '"]'); },
+    _mount: function (name) {
+      if (mounted[name] || !mods[name]) return;
+      var stage = this.slot(name);
+      if (!stage) return;
+      mounted[name] = true;
+      var host = this.section(name);
+      if (host && host.classList.contains("anim-stage")) host.classList.add("is-live");
+      try {
+        mods[name]({ stage: stage, section: this.section(name),
+                     reduce: REDUCE, lang: INSIDUS.lang, dict: INSIDUS.dict });
+      } catch (e) { mounted[name] = false; console.error("[insidus.anim]", name, e); }
+    },
+    _mountAll: function () { for (var k in mods) this._mount(k); },
+    names: function () { return $$("[data-anim-slot]").map(function (n) { return n.getAttribute("data-anim-slot"); }); }
+  };
+})();
+
+/* ============================== CHROME ================================== */
+function chrome() {
+  // nav turns solid once the opening frame is behind us
+  var nav = $("#nav"), intro = $("#intro") || $("#phero");
+  var queued = false;
+  function paint() {
+    queued = false;
+    var past = intro ? (intro.getBoundingClientRect().bottom <= 80) : (scrollY > 80);
+    if (nav) nav.classList.toggle("is-solid", past);
+  }
+  addEventListener("scroll", function () {
+    if (!queued) { queued = true; requestAnimationFrame(paint); }
+  }, { passive: true });
+  addEventListener("resize", paint);
+  paint();
+
+  // mobile fullscreen menu
+  var menu = $("#menu");
+  function toggleMenu(open) {
+    if (!menu) return;
+    menu.classList.toggle("is-open", open);
+    document.body.style.overflow = open ? "hidden" : "";
+    var t = $("#menu-open"); if (t) t.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  on("#menu-open", "click", function () { toggleMenu(true); });
+  on("#menu-close", "click", function () { toggleMenu(false); });
+  if (menu) menu.addEventListener("click", function (e) {
+    if (e.target.closest("a")) toggleMenu(false);
+  });
+
+  // language dropdown
+  var lang = $("#lang");
+  on("#lang-btn", "click", function (e) {
+    e.stopPropagation();
+    if (lang) lang.classList.toggle("is-open");
+  });
+  document.addEventListener("click", function () { if (lang) lang.classList.remove("is-open"); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { if (lang) lang.classList.remove("is-open"); toggleMenu(false); }
+  });
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("a[data-lang]");
+    if (!a) return;
+    e.preventDefault();
+    if (lang) lang.classList.remove("is-open");
+    setLang(a.getAttribute("data-lang"), true);
+  });
+
+  // contact form → prefilled mail today; a CRM/WhatsApp transport can replace
+  // this handler without touching the markup or the copy.
+  var form = $("#contact-form");
+  if (form) form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var d = INSIDUS.dict; if (!d) return;
+    var g = function (id) { var n = $("#f-" + id); return n ? n.value.trim() : ""; };
+    var lines = [
+      d.contact.name + ": " + g("name"),
+      d.contact.company + ": " + g("company"),
+      d.contact.country + ": " + g("country"),
+      d.contact.email + ": " + g("email"),
+      d.contact.interest + ": " + (g("interest") || d.contact.any),
+      "", g("message")
+    ].join("\n");
+    var subject = d.contact.title + (g("interest") ? " — " + g("interest") : "");
+    location.href = "mailto:" + FACTS.email +
+      "?subject=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(lines);
+  });
+}
+function on(sel, ev, fn) { var n = $(sel); if (n) n.addEventListener(ev, fn); }
+
+/* reveals: added by script so no-JS leaves nothing at zero opacity */
+var riseObs = null;
+function markRises() {
+  if (REDUCE) return;
+  if (!riseObs && "IntersectionObserver" in W) {
+    riseObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-in"); riseObs.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -10% 0px" });
+  }
+  if (!riseObs) return;
+  $$(".js-rise").forEach(function (n) {
+    if (!n.hasAttribute("data-observed")) { n.setAttribute("data-observed", ""); riseObs.observe(n); }
+  });
+}
+
+/* nav current-section marking */
+function navSpy() {
+  if (!("IntersectionObserver" in W) || PAGE !== "home") return;
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var id = "#" + e.target.id;
+      $$("#nav-links a").forEach(function (a) {
+        a.setAttribute("aria-current", a.getAttribute("href").slice(-id.length) === id ? "true" : "false");
+      });
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  ["products", "about", "process", "quality", "global", "contact"].forEach(function (id) {
+    var n = document.getElementById(id); if (n) obs.observe(n);
+  });
+}
+
+/* ================================ BOOT ================================== */
+chrome();
+navSpy();
+setLang(pickLang(), false);
+
+})();
