@@ -26,3 +26,21 @@ que en el repositorio es `web/v2/assets/img/`. Copia esa carpeta a
 Comprobaciones en Chromium: `check.mjs` (contraste, enlaces, SEO),
 `anim-check.mjs` (el intro), `map-check.mjs` (el globo). Cada una verifica el
 sitio con el módulo, sin el módulo, y con movimiento reducido.
+
+## Publicar en Vercel
+
+Vercel protege los despliegues de rama detrás de su inicio de sesión, así que
+la única URL pública de un proyecto es la de producción. El proyecto
+`insidus-spa` (https://insidus-spa.vercel.app) recibe un despliegue directo
+de las nueve páginas HTML; el CSS, el JS, las fotos y los locales se sirven
+desde jsDelivr sobre este mismo repositorio, fijados a un commit:
+
+```
+git push                                   # y anota el SHA
+INSIDUS_CDN="https://cdn.jsdelivr.net/gh/Bastyvaldebenito27-bit/Orvenastudio@<sha>/web/v2" \
+  python3 build/build.py
+# sube dist/index.html y dist/products/*/index.html a Vercel
+```
+
+El SHA va fijado a propósito: así una publicación no cambia bajo los pies de
+la anterior. Al cambiarlo hay que volver a compilar y volver a subir.
