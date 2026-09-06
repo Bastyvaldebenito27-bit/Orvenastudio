@@ -160,10 +160,10 @@ function Navbar(d) {
 function navItems(d) {
   var root = PAGE === "product" ? BASE : "";
   return [
-    { label: d.nav.products, href: root + "#products" },
     { label: d.nav.about,    href: root + "#about" },
-    { label: d.nav.process,  href: root + "#process" },
+    { label: d.nav.products, href: root + "#products" },
     { label: d.nav.quality,  href: root + "#quality" },
+    { label: d.nav.process,  href: root + "#process" },
     { label: d.nav.global,   href: root + "#global" },
     { label: d.nav.contact,  href: root + "#contact" }
   ];
@@ -184,20 +184,50 @@ function LanguageSwitcher(lang, d) {
   });
 }
 
-function CinematicIntro(d) {
-  setText("#intro-coord", d.intro.coord);
-  setText("#intro-scroll", d.intro.scroll);
-  var line = clear("#intro-line");
-  if (line) {
-    line.appendChild(document.createTextNode(d.intro.line1 + " "));
-    line.appendChild(el("b", null, d.intro.line2));
+function Hero(d) {
+  setText("#hero-eyebrow", d.intro.coord);
+  setText("#hero-scroll", d.intro.scroll);
+  var claim = clear("#hero-claim");
+  if (claim) {
+    claim.appendChild(document.createTextNode(d.hero.claim1));
+    claim.appendChild(el("b", null, d.hero.claim2));
   }
 }
 
-function OceanSection(d) {
-  setText("#ocean-kicker", d.ocean.kicker);
-  setText("#ocean-title", d.ocean.title);
-  setText("#ocean-body", d.ocean.body);
+/* The statement: one sentence carrying the position, then the short reading
+   of the ocean it comes from. */
+function Statement(d) {
+  setText("#statement-kicker", d.ocean.kicker);
+  setText("#statement-line", d.statement.line);
+  setText("#statement-title", d.ocean.title);
+  setText("#statement-body", d.ocean.body);
+}
+
+/* The cinematic frame. Copy only — whether it holds a film or is still
+   waiting for one is decided in MEDIA, at build time. */
+function Film(d) {
+  setText("#film-kicker", d.film.kicker);
+  setText("#film-line", d.film.line);
+  setText("#film-note", d.film.note);
+  setText("#film-slot", d.ui.filmSlot);
+}
+
+/* Three figures under ABOUT. Two are known — the species on the list and the
+   address the company trades from. The third stays an editable field. */
+function Figures(d) {
+  var host = clear("#about-figures");
+  if (!host) return;
+  var vals = [String(SPECIES.length).padStart(2, "0"), FACTS.base, null];
+  (d.figures || []).forEach(function (k, i) {
+    var f = el("div", "figure js-rise");
+    f.setAttribute("data-delay", String(Math.min(i, 3)));
+    var v = el("span", "figure__v");
+    if (vals[i]) v.textContent = vals[i];
+    else v.appendChild(el("span", "editable", d.ui.editable));
+    f.appendChild(v);
+    f.appendChild(el("span", "figure__k tag", k));
+    host.appendChild(f);
+  });
 }
 
 function AboutSection(d) {
@@ -219,17 +249,18 @@ function ProductShowcase(d) {
   SPECIES.forEach(function (s) {
     var art = el("article", "product js-rise");
 
-    var hi = PHOTOS[s.slug], ref = (CFG.thumbs || {})[s.slug];
-    var media = el("div", "product__media" + (hi ? "" : (ref ? " product__media--ref" : " product__media--empty")));
-    if (hi || ref) {
+    /* The frame keeps its size whether or not the photograph exists, so
+       dropping artwork into PRODUCT_MEDIA never moves the layout. */
+    var media = el("div", "product__media");
+    var shot = (CFG.productMedia || {})[s.slug];
+    if (shot) {
       var img = el("img");
-      img.src = hi || ref; img.alt = s.name + " — " + s.trade;
-      img.width = 200; img.height = 200;
+      img.src = shot;
+      img.alt = s.name + " — " + s.trade;
       img.loading = "lazy"; img.decoding = "async";
       media.appendChild(img);
-      if (!hi) media.appendChild(el("span", "tag", d.prodfields.editable));
     } else {
-      media.appendChild(el("span", "tag", d.prodfields.editable));
+      media.appendChild(photoSlot(d, s.slug + ".jpg", "1600 \u00d7 2000", (CFG.thumbs || {})[s.slug], d.ui.reference));
     }
 
     var info = el("div");
@@ -244,12 +275,29 @@ function ProductShowcase(d) {
     var a = el("a", "product__cta");
     a.href = BASE + "products/" + s.slug + "/" + langQuery();
     a.appendChild(el("span", null, d.products.view));
-    a.appendChild(el("i", null, "→"));
+    a.appendChild(el("i", null, "\u2192"));
     info.appendChild(a);
 
     art.appendChild(media); art.appendChild(info);
     host.appendChild(art);
   });
+}
+
+/* A placeholder that says, on the page, exactly which file the frame wants —
+   with the low-resolution working copy shown small and labelled, so nobody
+   mistakes it for the artwork. */
+function photoSlot(d, filename, dims, refSrc, refLabel) {
+  var ph = el("div", "ph");
+  ph.appendChild(el("span", "ph__k", d.ui.photoSlot));
+  ph.appendChild(el("span", "ph__f", filename));
+  ph.appendChild(el("span", "ph__d", dims));
+  if (refSrc) {
+    var t = el("img", "ph__ref");
+    t.src = refSrc; t.alt = ""; t.loading = "lazy"; t.decoding = "async";
+    ph.appendChild(t);
+    ph.appendChild(el("span", "ph__d", refLabel));
+  }
+  return ph;
 }
 
 function ProcessTimeline(d) {
@@ -259,11 +307,45 @@ function ProcessTimeline(d) {
   var host = clear("#process-list");
   if (!host) return;
   d.process.stages.forEach(function (st, i) {
-    var row = el("div", "stage js-rise");
+    var row = el("div", "link js-rise");
     row.appendChild(el("span", "num", String(i + 1).padStart(2, "0")));
-    row.appendChild(el("h3", "stage__t", st[0]));
-    row.appendChild(el("p", "stage__b", st[1]));
+    row.appendChild(el("h3", "link__t", st[0]));
+    row.appendChild(el("p", "link__b", st[1]));
     host.appendChild(row);
+  });
+}
+
+/* Quality as four numbered movements rather than a list of features. */
+function Quality(d) {
+  setText("#quality-kicker", d.quality.kicker);
+  setText("#quality-title", d.quality.title);
+  setText("#quality-lead", d.quality.lead);
+  var host = clear("#quality-list");
+  if (!host) return;
+  d.quality.items.forEach(function (it, i) {
+    var b = el("div", "qual js-rise");
+    b.setAttribute("data-delay", String(i % 2));
+    b.appendChild(el("p", "qual__n", String(i + 1).padStart(2, "0")));
+    b.appendChild(el("h3", "qual__t", it[0]));
+    b.appendChild(el("p", "qual__b", it[1]));
+    host.appendChild(b);
+  });
+}
+
+/* What INSIDUS offers a buyer over time — the commercial position, stated
+   without a single number it cannot stand behind. */
+function Partners(d) {
+  setText("#partners-kicker", d.partners.kicker);
+  setText("#partners-title", d.partners.title);
+  setText("#partners-lead", d.partners.lead);
+  var host = clear("#partners-list");
+  if (!host) return;
+  d.partners.items.forEach(function (it, i) {
+    var b = el("div", "partner js-rise");
+    b.setAttribute("data-delay", String(Math.min(i, 3)));
+    b.appendChild(el("h3", "partner__t", it[0]));
+    b.appendChild(el("p", "partner__b", it[1]));
+    host.appendChild(b);
   });
 }
 
@@ -357,6 +439,17 @@ function Footer(d) {
     tag.appendChild(document.createTextNode(d.footer.tagline1 + " "));
     tag.appendChild(el("b", null, d.footer.tagline2));
   }
+  var addr = clear("#foot-addr");
+  if (addr) {
+    addr.appendChild(el("span", null, FACTS.address));
+    addr.appendChild(el("br"));
+    var m = el("a", null, FACTS.email); m.href = "mailto:" + FACTS.email;
+    addr.appendChild(m);
+    addr.appendChild(document.createTextNode(" · "));
+    var t = el("a", null, FACTS.phone);
+    t.href = "tel:" + String(FACTS.phone || "").replace(/\s/g, "");
+    addr.appendChild(t);
+  }
   setText("#foot-nav-title", d.footer.nav);
   setText("#foot-lang-title", d.footer.langs);
   setText("#foot-base", "© " + new Date().getFullYear() + " " + d.footer.legal + " · " + d.footer.rights);
@@ -446,14 +539,17 @@ function render(lang, d) {
   Footer(d);
   ContactForm(d);
   if (PAGE === "home") {
-    CinematicIntro(d);
-    OceanSection(d);
+    Hero(d);
+    Statement(d);
     AboutSection(d);
+    Figures(d);
     ProductShowcase(d);
+    Film(d);
+    Quality(d);
     ProcessTimeline(d);
-    PairsSection("quality", d.quality);
     PairsSection("trace", d.trace);
     GlobalReach(d);
+    Partners(d);
     FinalMoment(d);
   } else if (PAGE === "product") {
     ProductDetail(d);
@@ -511,11 +607,11 @@ INSIDUS.anim = (function () {
 /* ============================== CHROME ================================== */
 function chrome() {
   // nav turns solid once the opening frame is behind us
-  var nav = $("#nav"), intro = $("#intro") || $("#phero");
+  var nav = $("#nav"), opening = $("#hero") || $("#phero");
   var queued = false;
   function paint() {
     queued = false;
-    var past = intro ? (intro.getBoundingClientRect().bottom <= 80) : (scrollY > 80);
+    var past = opening ? (opening.getBoundingClientRect().bottom <= 90) : (scrollY > 90);
     if (nav) nav.classList.toggle("is-solid", past);
   }
   addEventListener("scroll", function () {
@@ -608,7 +704,7 @@ function navSpy() {
       });
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
-  ["products", "about", "process", "quality", "global", "contact"].forEach(function (id) {
+  ["about", "products", "quality", "process", "global", "contact"].forEach(function (id) {
     var n = document.getElementById(id); if (n) obs.observe(n);
   });
 }

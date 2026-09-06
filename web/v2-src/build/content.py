@@ -540,3 +540,162 @@ C["ko"] = L(
  {"tagline1": "칠레 태평양에서", "tagline2": "세계로", "nav": "내비게이션",
   "langs": "언어", "rights": "모든 권리 보유.", "legal": "INSIDUS SpA"},
  {"editable": "미정", "back": "뒤로", "next": "다음 제품", "of": "/", "langLabel": "언어"})
+
+
+# ============================================================================
+# Added for the corporate edition: the brand statement, the film section, the
+# B2B positioning block and the small figure row under ABOUT.
+#
+# Kept as a separate table rather than widening L(), so the nine existing
+# blocks stay legible and a new section never means editing nine call sites.
+# Nothing here asserts a market, a volume or a certification: the only figures
+# are ones INSIDUS already knows — the species it lists and the address it
+# trades from. Everything else stays an editable field.
+# ============================================================================
+
+def X(hero, statement, film, partners, figures, ui):
+    return {"hero": hero, "statement": statement, "film": film,
+            "partners": partners, "figures": figures, "ui2": ui}
+
+EXTRA = {}
+
+EXTRA["es"] = X(
+ {"claim1": "Producto del Pacífico Sur.", "claim2": "Alcance internacional."},
+ {"line": "El estándar lo fija el agua. Nuestro trabajo es no perderlo en el camino."},
+ {"kicker": "El oficio", "line": "Todo lo que ocurre entre el agua y el contenedor.",
+  "note": "Pieza audiovisual en preparación."},
+ {"kicker": "Alianza", "title": "Un socio, no un proveedor ocasional",
+  "lead": "Lo que un comprador necesita sostener en el tiempo.",
+  "items": [("Suministro constante", "Programamos por temporada y especie, no por oportunidad puntual."),
+            ("Calidad repetible", "El mismo calibre y la misma condición, embarque tras embarque."),
+            ("Logística internacional", "Consolidación, documentación y despacho hasta el puerto de destino."),
+            ("Relación de largo plazo", "Preferimos construir un programa anual antes que una operación suelta.")]},
+ ["Especies", "Base", "Mercados"],
+ {"photoSlot": "Reservado para fotografía", "filmSlot": "Reservado para video",
+  "replace": "Reemplazar", "reference": "Referencia"})
+
+EXTRA["en"] = X(
+ {"claim1": "South Pacific seafood.", "claim2": "Global reach."},
+ {"line": "The water sets the standard. Our work is not to lose it on the way."},
+ {"kicker": "The craft", "line": "Everything that happens between the water and the container.",
+  "note": "Film in preparation."},
+ {"kicker": "Partnership", "title": "A partner, not an occasional supplier",
+  "lead": "What a buyer needs to hold over time.",
+  "items": [("Reliable supply", "We plan by season and species, not by one-off opportunity."),
+            ("Consistent quality", "The same grade and the same condition, shipment after shipment."),
+            ("Global logistics", "Consolidation, documentation and dispatch to the destination port."),
+            ("Long-term partnership", "We would rather build an annual programme than a single deal.")]},
+ ["Species", "Base", "Markets"],
+ {"photoSlot": "Reserved for photography", "filmSlot": "Reserved for film",
+  "replace": "Replace", "reference": "Reference"})
+
+EXTRA["zh"] = X(
+ {"claim1": "南太平洋的海产。", "claim2": "通达全球市场。"},
+ {"line": "标准由这片海水设定。我们的工作，是让它一路不失。"},
+ {"kicker": "工艺", "line": "从海水到集装箱之间发生的一切。",
+  "note": "影片制作中。"},
+ {"kicker": "合作", "title": "长期伙伴，而非临时供应商",
+  "lead": "买家需要长期依靠的，正是这几件事。",
+  "items": [("稳定供应", "按季节与鱼种规划，而非依赖一次性机会。"),
+            ("品质如一", "同样的规格，同样的状态，每一批皆然。"),
+            ("国际物流", "集港、单证与发运，直至目的港。"),
+            ("长期关系", "我们更愿意建立年度计划，而非单笔交易。")]},
+ ["品类", "基地", "市场"],
+ {"photoSlot": "预留摄影位", "filmSlot": "预留影片位",
+  "replace": "待替换", "reference": "参考图"})
+
+EXTRA["fr"] = X(
+ {"claim1": "Produits du Pacifique Sud.", "claim2": "Portée internationale."},
+ {"line": "C'est l'eau qui fixe la norme. Notre travail est de ne pas la perdre en route."},
+ {"kicker": "Le métier", "line": "Tout ce qui se passe entre l'eau et le conteneur.",
+  "note": "Film en préparation."},
+ {"kicker": "Partenariat", "title": "Un partenaire, non un fournisseur occasionnel",
+  "lead": "Ce qu'un acheteur a besoin de tenir dans la durée.",
+  "items": [("Approvisionnement constant", "Nous planifions par saison et par espèce, non au gré des occasions."),
+            ("Qualité constante", "Le même calibre et le même état, expédition après expédition."),
+            ("Logistique internationale", "Groupage, documentation et expédition jusqu'au port de destination."),
+            ("Relation de long terme", "Nous préférons bâtir un programme annuel plutôt qu'une opération isolée.")]},
+ ["Espèces", "Base", "Marchés"],
+ {"photoSlot": "Réservé à la photographie", "filmSlot": "Réservé à la vidéo",
+  "replace": "À remplacer", "reference": "Référence"})
+
+EXTRA["it"] = X(
+ {"claim1": "Prodotti del Pacifico meridionale.", "claim2": "Portata internazionale."},
+ {"line": "È l'acqua a fissare lo standard. Il nostro lavoro è non perderlo per strada."},
+ {"kicker": "Il mestiere", "line": "Tutto ciò che accade fra l'acqua e il container.",
+  "note": "Filmato in preparazione."},
+ {"kicker": "Alleanza", "title": "Un partner, non un fornitore occasionale",
+  "lead": "Ciò che un compratore deve poter contare nel tempo.",
+  "items": [("Fornitura costante", "Programmiamo per stagione e per specie, non per occasione isolata."),
+            ("Qualità ripetibile", "La stessa pezzatura e la stessa condizione, spedizione dopo spedizione."),
+            ("Logistica internazionale", "Consolidamento, documentazione e spedizione fino al porto di destino."),
+            ("Rapporto di lungo periodo", "Preferiamo costruire un programma annuale che una singola operazione.")]},
+ ["Specie", "Sede", "Mercati"],
+ {"photoSlot": "Riservato alla fotografia", "filmSlot": "Riservato al video",
+  "replace": "Da sostituire", "reference": "Riferimento"})
+
+EXTRA["de"] = X(
+ {"claim1": "Erzeugnisse des Südpazifiks.", "claim2": "Weltweite Reichweite."},
+ {"line": "Den Maßstab setzt das Wasser. Unsere Aufgabe ist, ihn unterwegs nicht zu verlieren."},
+ {"kicker": "Das Handwerk", "line": "Alles, was zwischen Wasser und Container geschieht.",
+  "note": "Film in Vorbereitung."},
+ {"kicker": "Partnerschaft", "title": "Ein Partner, kein Gelegenheitslieferant",
+  "lead": "Worauf ein Einkäufer auf Dauer bauen können muss.",
+  "items": [("Verlässliche Versorgung", "Wir planen nach Saison und Art, nicht nach einzelner Gelegenheit."),
+            ("Gleichbleibende Qualität", "Dieselbe Sortierung, derselbe Zustand — Lieferung für Lieferung."),
+            ("Internationale Logistik", "Konsolidierung, Dokumentation und Versand bis zum Bestimmungshafen."),
+            ("Langfristige Beziehung", "Lieber ein Jahresprogramm als ein einzelnes Geschäft.")]},
+ ["Arten", "Standort", "Märkte"],
+ {"photoSlot": "Für Fotografie reserviert", "filmSlot": "Für Video reserviert",
+  "replace": "Zu ersetzen", "reference": "Referenz"})
+
+EXTRA["pt"] = X(
+ {"claim1": "Produtos do Pacífico Sul.", "claim2": "Alcance internacional."},
+ {"line": "É a água que define o padrão. O nosso trabalho é não o perder pelo caminho."},
+ {"kicker": "O ofício", "line": "Tudo o que acontece entre a água e o contentor.",
+  "note": "Filme em preparação."},
+ {"kicker": "Parceria", "title": "Um parceiro, não um fornecedor ocasional",
+  "lead": "Aquilo em que um comprador precisa de se apoiar ao longo do tempo.",
+  "items": [("Fornecimento constante", "Programamos por época e por espécie, não por oportunidade isolada."),
+            ("Qualidade repetível", "O mesmo calibre e a mesma condição, embarque após embarque."),
+            ("Logística internacional", "Consolidação, documentação e expedição até ao porto de destino."),
+            ("Relação de longo prazo", "Preferimos construir um programa anual a uma operação avulsa.")]},
+ ["Espécies", "Base", "Mercados"],
+ {"photoSlot": "Reservado para fotografia", "filmSlot": "Reservado para vídeo",
+  "replace": "A substituir", "reference": "Referência"})
+
+EXTRA["ja"] = X(
+ {"claim1": "南太平洋の水産物。", "claim2": "世界の市場へ。"},
+ {"line": "基準を決めるのは海である。それを届くまで損なわないことが、私たちの仕事だ。"},
+ {"kicker": "仕事", "line": "海からコンテナに至るまでに起きる、そのすべて。",
+  "note": "映像は準備中です。"},
+ {"kicker": "パートナーシップ", "title": "一度きりの供給者ではなく、長く組む相手として",
+  "lead": "買い手が長期にわたって頼れること。",
+  "items": [("安定した供給", "その場の機会ではなく、季節と魚種で計画します。"),
+            ("再現できる品質", "同じ規格、同じ状態を、出荷のたびに。"),
+            ("国際物流", "仕向港までの混載、書類、出荷手配。"),
+            ("長期の関係", "単発の取引よりも、年間の計画を組むことを選びます。")]},
+ ["取扱魚種", "拠点", "市場"],
+ {"photoSlot": "写真用スペース", "filmSlot": "映像用スペース",
+  "replace": "差し替え予定", "reference": "参考画像"})
+
+EXTRA["ko"] = X(
+ {"claim1": "남태평양의 수산물.", "claim2": "세계 시장으로."},
+ {"line": "기준은 바다가 정한다. 그것을 도착까지 잃지 않는 것이 우리의 일이다."},
+ {"kicker": "일", "line": "바다에서 컨테이너에 이르기까지, 그 사이의 모든 것.",
+  "note": "영상은 준비 중입니다."},
+ {"kicker": "파트너십", "title": "일회성 공급자가 아니라, 오래 가는 파트너로",
+  "lead": "바이어가 오랫동안 기댈 수 있어야 하는 것들.",
+  "items": [("안정적인 공급", "일회성 기회가 아니라 시즌과 어종으로 계획합니다."),
+            ("일관된 품질", "같은 규격과 같은 상태를, 선적할 때마다."),
+            ("국제 물류", "목적항까지의 혼재, 서류, 출고."),
+            ("장기적인 관계", "단발 거래보다 연간 프로그램을 함께 만드는 편을 택합니다.")]},
+ ["취급 어종", "거점", "시장"],
+ {"photoSlot": "사진 자리", "filmSlot": "영상 자리",
+  "replace": "교체 예정", "reference": "참고 이미지"})
+
+# fold the extra blocks in, and merge ui2 into the existing ui block
+for _l, _x in EXTRA.items():
+    _x = dict(_x)
+    C[_l]["ui"].update(_x.pop("ui2"))
+    C[_l].update(_x)

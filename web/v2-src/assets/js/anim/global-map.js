@@ -81,11 +81,11 @@ function mount(ctx) {
   var COL = {
     abyss:    css(root, "--abyss")    || "#03070E",
     deep:     css(root, "--deep")     || "#071C33",
-    pacific:  css(root, "--pacific")  || "#0E4C92",
+    pacific:  css(root, "--tide")  || "#0E4C92",
     ocean:    css(root, "--ocean")    || "#2E7BC4",
     ice:      css(root, "--ice")      || "#EDF3F8",
     fog:      css(root, "--fog")      || "#8FA6BC",
-    electric: css(root, "--electric") || "#3BE0E6"
+    accent:   css(root, "--accent") || "#A9C3D4"
   };
 
   var W = 0, H = 0, R = 0, cx = 0, cy = 0, dpr = 1, stars = [];
@@ -138,14 +138,14 @@ function mount(ctx) {
     g.beginPath(); g.arc(cx, cy, R, 0, 6.2832); g.clip();
     var rim = g.createRadialGradient(cx - R * 0.62, cy - R * 0.62, R * 0.55,
                                      cx - R * 0.5, cy - R * 0.5, R * 1.35);
-    rim.addColorStop(0, "rgba(59,224,230,0)");
-    rim.addColorStop(0.72, "rgba(59,224,230,.10)");
-    rim.addColorStop(1, "rgba(59,224,230,0)");
+    rim.addColorStop(0, "rgba(169,195,212,0)");
+    rim.addColorStop(0.72, "rgba(169,195,212,.12)");
+    rim.addColorStop(1, "rgba(169,195,212,0)");
     g.fillStyle = rim; g.fillRect(cx - R, cy - R, R * 2, R * 2);
     g.restore();
 
     g.beginPath(); g.arc(cx, cy, R, 0, 6.2832);
-    g.strokeStyle = "rgba(143,166,188,.28)"; g.lineWidth = 1; g.stroke();
+    g.strokeStyle = "rgba(147,163,176,.28)"; g.lineWidth = 1; g.stroke();
   }
 
   function graticule(spin) {
@@ -159,7 +159,7 @@ function mount(ctx) {
         if (pt.z <= 0) { first = true; continue; }
         if (first) { g.moveTo(pt.x, pt.y); first = false; } else g.lineTo(pt.x, pt.y);
       }
-      g.strokeStyle = lat === 0 ? "rgba(143,166,188,.30)" : "rgba(143,166,188,.15)";
+      g.strokeStyle = lat === 0 ? "rgba(147,163,176,.30)" : "rgba(147,163,176,.15)";
       g.stroke();
     }
     // meridians
@@ -171,7 +171,7 @@ function mount(ctx) {
         if (pt.z <= 0) { first = true; continue; }
         if (first) { g.moveTo(pt.x, pt.y); first = false; } else g.lineTo(pt.x, pt.y);
       }
-      g.strokeStyle = "rgba(143,166,188,.15)";
+      g.strokeStyle = "rgba(147,163,176,.15)";
       g.stroke();
     }
   }
@@ -191,7 +191,7 @@ function mount(ctx) {
             g.moveTo(run[0], run[1]);
             for (var k = 2; k < run.length; k += 2) g.lineTo(run[k], run[k + 1]);
             g.fillStyle = "rgba(237,243,248,.055)"; g.fill();
-            g.strokeStyle = "rgba(143,166,188,.42)"; g.lineWidth = 1; g.stroke();
+            g.strokeStyle = "rgba(147,163,176,.42)"; g.lineWidth = 1; g.stroke();
           }
           run = null;
           continue;
@@ -213,7 +213,7 @@ function mount(ctx) {
     g.beginPath();
     g.moveTo(a.x, a.y);
     g.quadraticCurveTo(qx, qy, b.x, b.y);
-    g.strokeStyle = "rgba(59,224,230,.32)";
+    g.strokeStyle = "rgba(169,195,212,.34)";
     g.lineWidth = 1;
     g.stroke();
 
@@ -222,17 +222,17 @@ function mount(ctx) {
     var px = (1 - u) * (1 - u) * a.x + 2 * (1 - u) * u * qx + u * u * b.x;
     var py = (1 - u) * (1 - u) * a.y + 2 * (1 - u) * u * qy + u * u * b.y;
     g.beginPath(); g.arc(px, py, 2, 0, 6.2832);
-    g.fillStyle = COL.electric; g.fill();
+    g.fillStyle = COL.accent; g.fill();
   }
 
   function marker(p, pulse) {
     if (p.z <= 0) return;
     g.beginPath(); g.arc(p.x, p.y, 2.6, 0, 6.2832);
-    g.fillStyle = COL.electric; g.fill();
+    g.fillStyle = COL.accent; g.fill();
     if (pulse == null) return;
     var r = 3 + pulse * 13;
     g.beginPath(); g.arc(p.x, p.y, r, 0, 6.2832);
-    g.strokeStyle = "rgba(59,224,230," + (0.5 * (1 - pulse)).toFixed(3) + ")";
+    g.strokeStyle = "rgba(169,195,212," + (0.5 * (1 - pulse)).toFixed(3) + ")";
     g.lineWidth = 1; g.stroke();
   }
 
@@ -243,7 +243,7 @@ function mount(ctx) {
       if (Math.hypot(s.x - cx, s.y - cy) < R + 8) continue;
       var a = still ? 0.35 : 0.18 + 0.42 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
       g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832);
-      g.fillStyle = "rgba(237,243,248," + a.toFixed(3) + ")";
+      g.fillStyle = "rgba(241,244,246," + a.toFixed(3) + ")";
       g.fill();
     }
   }

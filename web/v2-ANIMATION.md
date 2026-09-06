@@ -27,15 +27,16 @@ Helpers: `INSIDUS.anim.slot(name)`, `INSIDUS.anim.section(name)`,
 
 | Name | Section id | Kind | Status |
 |---|---|---|---|
-| `CinematicIntro` | `#cinematic-intro` | background | `assets/js/anim/cinematic-intro.js` |
-| `OceanTransition` | `#ocean-transition` | background | free |
+| `CinematicIntro` | `#hero` | background | `assets/js/anim/cinematic-intro.js` |
+| `OceanTransition` | `#statement` | background | free |
 | `ProductAnimation` | `#product-animation` | stage | free |
 | `ProcessAnimation` | `#process-animation` | stage | free |
 | `GlobalMap` | `#global-map` | background | `assets/js/anim/global-map.js` |
 | `FinalAnimation` | `#final-animation` | background | free |
 
 **Background** stages are absolutely positioned behind the section's own
-content, which stays legible on top. Draw atmosphere here — video, WebGL, a
+content, which stays legible on top. In `#hero` the stage sits *above* the
+scrim, so a module draws into the picture rather than under the dimming layer. Draw atmosphere here — video, WebGL, a
 particle field, a shader.
 
 **Stage** stages occupy **zero height** until a module mounts. On mount the
