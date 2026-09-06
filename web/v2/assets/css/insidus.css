@@ -590,6 +590,12 @@ main,header,footer{ position:relative; z-index:1 }
 /* In the two full-bleed frames the stage sits above the scrim, so a module
    draws into the picture rather than under the dimming layer. */
 .hero > .slot, .film > .slot{ z-index:2 }
+/* The hero's media layer is itself a stage, so it carries data-anim-slot and
+   would otherwise pick up the position:relative above; it has to stay
+   absolute. Its stage sits over the waiting-placeholder and under the scrim,
+   which is where footage would be. */
+.hero__media[data-anim-slot]{ position:absolute }
+.hero__media > .slot{ z-index:1 }
 /* A stage slot occupies nothing until a module mounts, so the page has no
    empty gaps with none of them integrated. */
 .anim-stage{ height:0; overflow:hidden; position:relative }

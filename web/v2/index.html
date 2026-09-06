@@ -46,7 +46,9 @@
      .hero__media with an <img> or a looping <video> and nothing else in
      this file, the stylesheet or the script has to change. -->
 <section class="hero" id="hero" data-anim-slot="CinematicIntro">
-  <div class="hero__media" data-media="hero"><div class="ph" aria-hidden="true"></div></div>
+  <div class="hero__media" data-media="hero" data-anim-slot="HeroField"><div class="ph" aria-hidden="true"></div>
+    <div class="slot" aria-hidden="true"></div>
+  </div>
   <div class="hero__scrim" aria-hidden="true"></div>
   <div class="slot" aria-hidden="true"></div>
   <div class="hero__in">
@@ -253,5 +255,6 @@
 <script src="/assets/js/insidus.js" defer></script>
 <script src="/assets/js/anim/cinematic-intro.js" defer></script>
 <script src="/assets/js/anim/global-map.js" defer></script>
+<script src="/assets/js/anim/hero-field.js" defer></script>
 </body>
 </html>

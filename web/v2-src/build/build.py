@@ -18,7 +18,7 @@ DIST = os.path.join(ROOT, "dist")
 ASSETS = os.path.join(ROOT, "assets")
 
 # animation modules, in load order; each one is optional by contract
-ANIM = ["cinematic-intro.js", "global-map.js"]
+ANIM = ["cinematic-intro.js", "global-map.js", "hero-field.js"]
 # Assets and locales can be served from elsewhere; the pages and their links
 # stay where they are. Empty means everything is served from the same origin.
 CDN = os.environ.get("INSIDUS_CDN", "").rstrip("/")
@@ -213,7 +213,9 @@ HOME_MAIN = """
      .hero__media with an <img> or a looping <video> and nothing else in
      this file, the stylesheet or the script has to change. -->
 <section class="hero" id="hero" data-anim-slot="CinematicIntro">
-  <div class="hero__media" data-media="hero">{HERO_MEDIA}</div>
+  <div class="hero__media" data-media="hero" data-anim-slot="HeroField">{HERO_MEDIA}
+    <div class="slot" aria-hidden="true"></div>
+  </div>
   <div class="hero__scrim" aria-hidden="true"></div>
   <div class="slot" aria-hidden="true"></div>
   <div class="hero__in">

@@ -585,7 +585,10 @@ INSIDUS.anim = (function () {
       this._mount(name);
       return this;
     },
-    slot: function (name) { return $('[data-anim-slot="' + name + '"] .slot'); },
+    /* Direct child, not descendant: a slot may sit inside another slot's
+       section (the hero holds one for its media layer), and a descendant
+       lookup would hand the outer module the inner stage. */
+    slot: function (name) { return $('[data-anim-slot="' + name + '"] > .slot'); },
     section: function (name) { return $('[data-anim-slot="' + name + '"]'); },
     _mount: function (name) {
       if (mounted[name] || !mods[name]) return;

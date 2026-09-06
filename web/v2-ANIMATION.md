@@ -23,11 +23,16 @@ name, that stage stays empty and nothing about the page changes.
 Helpers: `INSIDUS.anim.slot(name)`, `INSIDUS.anim.section(name)`,
 `INSIDUS.anim.names()`.
 
+A stage is the **direct child** `.slot` of its host, not any descendant — the
+hero's media layer is itself a stage nested inside the hero's own, and a
+descendant lookup would hand the outer module the inner stage.
+
 ## The six stages
 
 | Name | Section id | Kind | Status |
 |---|---|---|---|
 | `CinematicIntro` | `#hero` | background | `assets/js/anim/cinematic-intro.js` |
+| `HeroField` | `.hero__media` | background | `assets/js/anim/hero-field.js` |
 | `OceanTransition` | `#statement` | background | free |
 | `ProductAnimation` | `#product-animation` | stage | free |
 | `ProcessAnimation` | `#process-animation` | stage | free |
@@ -114,3 +119,13 @@ the file: no image, no CDN, no licence to check. San Antonio (33°35′S
 section already lists — no market is named, because none is known. The loop
 runs only while the frame is on screen and the tab is visible; under reduced
 motion it paints one frame and stops.
+
+**`hero-field.js`** — a WebGL2 fragment shader filling the opening frame with
+slow, dark water: domain-warped noise, an iterative swirl and a three-colour
+blend, all on one quad and one DOM node. It is a stand-in for footage that
+does not exist yet, so it **refuses to mount** once `MEDIA["hero"]` carries a
+real `<img>` or `<video>` — it steps aside rather than sitting on top of the
+film. Without WebGL2, or if a shader fails to compile, it does not mount and
+the waiting-placeholder stays. Device pixel ratio is capped at 1.5 (1.25 under
+700px); the loop runs only while the frame is on screen and the tab visible;
+under reduced motion it paints one frame and stops.
