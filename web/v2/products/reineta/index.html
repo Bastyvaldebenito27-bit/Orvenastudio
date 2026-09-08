@@ -94,7 +94,10 @@
 </section>
 </main>
 
-<section class="band" id="contact">
+<!-- The form is where the whole page is pointing. Its slot lives on both
+     page kinds, since contact is outside <main> and shared. -->
+<section class="band" id="contact" data-anim-slot="ContactAnimation">
+  <div class="slot" aria-hidden="true"></div>
   <div class="shell">
     <p class="tag" id="contact-kicker"></p>
     <h2 class="display h-md upper" id="contact-title" style="margin:.6rem 0 1rem"></h2>
@@ -138,5 +141,6 @@
 
 <script>window.INSIDUS_CONFIG={"langs": ["es", "en", "zh", "fr", "it", "de", "pt", "ja", "ko"], "label": {"es": "ES", "en": "EN", "zh": "中文", "fr": "FR", "it": "IT", "de": "DE", "pt": "PT", "ja": "日本語", "ko": "한국어"}, "htmlLang": {"es": "es", "en": "en", "zh": "zh-Hans", "fr": "fr", "it": "it", "de": "de", "pt": "pt", "ja": "ja", "ko": "ko"}, "species": [{"slug": "jibia", "n": "01", "name": "JIBIA", "trade": "Jumbo Squid", "bino": "Dosidicus gigas"}, {"slug": "bacalao", "n": "02", "name": "BACALAO", "trade": "Chilean Seabass", "bino": "Dissostichus eleginoides"}, {"slug": "pez-espada", "n": "03", "name": "PEZ ESPADA", "trade": "Swordfish", "bino": "Xiphias gladius"}, {"slug": "merluza-austral", "n": "04", "name": "MERLUZA AUSTRAL", "trade": "Southern Hake", "bino": "Merluccius australis"}, {"slug": "merluza-gayi", "n": "05", "name": "MERLUZA GAYI", "trade": "South Pacific Hake", "bino": "Merluccius gayi"}, {"slug": "reineta", "n": "06", "name": "REINETA", "trade": "Pacific Pomfret", "bino": "Brama australis"}, {"slug": "jaiba", "n": "07", "name": "JAIBA", "trade": "Rock Crab", "bino": "Cancer spp."}, {"slug": "locos", "n": "08", "name": "LOCOS", "trade": "Chilean Abalone", "bino": "Concholepas concholepas"}], "facts": {"email": "mbonilla@valrey.cl", "phone": "+56 9 7637 9609", "address": "Av. Bernardo O'Higgins 2929, San Antonio, Valparaíso, Chile", "originLabel": "Chile · South Pacific", "base": "San Antonio, Chile"}, "photos": {"bacalao": "/assets/img/bacalao-hi.jpg"}, "thumbs": {"jibia": "/assets/img/calamar.jpg", "bacalao": "/assets/img/bacalao.jpg", "pez-espada": "/assets/img/albacora.jpg", "merluza-austral": "/assets/img/merluza-austral.jpg", "merluza-gayi": "/assets/img/merluza-gayi.jpg", "reineta": "/assets/img/reineta.jpg", "jaiba": "/assets/img/jaiba.jpg", "locos": "/assets/img/locos.jpg"}, "productMedia": {}, "base": "/"};</script>
 <script src="/assets/js/insidus.js" defer></script>
+<script src="/assets/js/anim/contact-form.js" defer></script>
 </body>
 </html>

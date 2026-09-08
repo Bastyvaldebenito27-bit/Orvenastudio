@@ -38,6 +38,7 @@ descendant lookup would hand the outer module the inner stage.
 | `ProcessAnimation` | `#process-animation` | stage | `assets/js/anim/process-chain.js` |
 | `GlobalMap` | `#global-map` | background | `assets/js/anim/global-map.js` |
 | `FinalAnimation` | `#final-animation` | background | `assets/js/anim/final-reveal.js` |
+| `ContactAnimation` | `#contact` | background | `assets/js/anim/contact-form.js` |
 
 **Background** stages are absolutely positioned behind the section's own
 content, which stays legible on top. In `#hero` the stage sits *above* the
@@ -200,3 +201,35 @@ Like `SpeciesIndex` it leaves its stage empty, so the registry hands the height
 back. Under reduced motion the counters are written at their final value and no
 rail is created at all; a counter stuck at `00` because the animation did not
 get to run would be worse than no animation.
+
+
+## ContactAnimation, and which modules a product page carries
+
+`#contact` lives outside `<main>` and is emitted on both page kinds, which
+makes it the first slot that is not home-page-only. So `build.py` grew a
+second list: `ANIM` for the home page, `ANIM_PRODUCT` for the eight product
+pages. A product page has no hero, no species index and no chain, so it now
+ships exactly one module instead of seven. (A module whose slot is absent
+simply never mounts, so this is about weight, not correctness.)
+
+The gestures are affordances first:
+
+* the underline of the focused field draws from the left, and its label takes
+  the accent — you can see which field has you. A field the visitor has
+  filled keeps its underline on blur: it reads as done rather than as reset.
+* the three direct-contact rows arrive in sequence with their rule drawing,
+  the same fading hairline the process rails use. Flat accent was tried and
+  rejected: three full-strength lines shouted next to a page whose every
+  other rule is a hairline at 16% alpha.
+* the submit fills by a sweep instead of a swap.
+
+Two things worth knowing if you touch this section:
+
+* `.slot` is `pointer-events:none`, and this is the one section where that
+  matters — an overlay over the form would break the only conversion path on
+  the site. Verify it with `elementFromPoint` and a real mouse click, not
+  with `page.focus()`, which does not hit-test and will pass over a blocking
+  overlay.
+* the direct rows are rebuilt on every language change, so they are marked
+  and re-observed on each `insidus:rendered`; the fields are not, so their
+  listeners are bound once and guarded by a class check.

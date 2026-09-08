@@ -190,7 +190,10 @@
 
 </main>
 
-<section class="band" id="contact">
+<!-- The form is where the whole page is pointing. Its slot lives on both
+     page kinds, since contact is outside <main> and shared. -->
+<section class="band" id="contact" data-anim-slot="ContactAnimation">
+  <div class="slot" aria-hidden="true"></div>
   <div class="shell">
     <p class="tag" id="contact-kicker"></p>
     <h2 class="display h-md upper" id="contact-title" style="margin:.6rem 0 1rem"></h2>
@@ -241,5 +244,6 @@
 <script src="/assets/js/anim/final-reveal.js" defer></script>
 <script src="/assets/js/anim/species-index.js" defer></script>
 <script src="/assets/js/anim/process-chain.js" defer></script>
+<script src="/assets/js/anim/contact-form.js" defer></script>
 </body>
 </html>

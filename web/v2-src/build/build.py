@@ -20,7 +20,12 @@ ASSETS = os.path.join(ROOT, "assets")
 # animation modules, in load order; each one is optional by contract
 ANIM = ["cinematic-intro.js", "global-map.js", "hero-field.js",
         "product-reveal.js", "final-reveal.js", "species-index.js",
-        "process-chain.js"]
+        "process-chain.js", "contact-form.js"]
+
+# A product page carries only the modules whose sections it actually has.
+# Contact is the one section shared with the home page; the rest would be
+# dead weight, and a module with no slot simply never mounts anyway.
+ANIM_PRODUCT = ["contact-form.js"]
 # Assets and locales can be served from elsewhere; the pages and their links
 # stay where they are. Empty means everything is served from the same origin.
 CDN = os.environ.get("INSIDUS_CDN", "").rstrip("/")
@@ -125,7 +130,10 @@ NAV = """
 """
 
 CONTACT = """
-<section class="band" id="contact">
+<!-- The form is where the whole page is pointing. Its slot lives on both
+     page kinds, since contact is outside <main> and shared. -->
+<section class="band" id="contact" data-anim-slot="ContactAnimation">
+  <div class="slot" aria-hidden="true"></div>
   <div class="shell">
     <p class="tag" id="contact-kicker"></p>
     <h2 class="display h-md upper" id="contact-title" style="margin:.6rem 0 1rem"></h2>
@@ -503,6 +511,8 @@ def build():
               + NAV.format(home="/") + PRODUCT_MAIN + CONTACT
               + "\n<script>" + cfgp + "</script>\n"
               + '<script src="' + CDN + '/assets/js/insidus.js" defer></script>\n'
+              + "".join('<script src="' + CDN + '/assets/js/anim/%s" defer></script>\n' % a
+                        for a in ANIM_PRODUCT)
               + "</body>\n</html>\n")
         write(os.path.join(DIST, "products", s["slug"], "index.html"), ph)
 
