@@ -27,14 +27,14 @@ A stage is the **direct child** `.slot` of its host, not any descendant — the
 hero's media layer is itself a stage nested inside the hero's own, and a
 descendant lookup would hand the outer module the inner stage.
 
-## The six stages
+## The stages
 
 | Name | Section id | Kind | Status |
 |---|---|---|---|
 | `CinematicIntro` | `#hero` | background | `assets/js/anim/cinematic-intro.js` |
 | `HeroField` | `.hero__media` | background | `assets/js/anim/hero-field.js` |
-| `OceanTransition` | `#statement` | background | free |
 | `ProductAnimation` | `#product-animation` | stage | `assets/js/anim/product-reveal.js` |
+| `SpeciesIndex` | `#products-index` | background | `assets/js/anim/species-index.js` |
 | `ProcessAnimation` | `#process-animation` | stage | free |
 | `GlobalMap` | `#global-map` | background | `assets/js/anim/global-map.js` |
 | `FinalAnimation` | `#final-animation` | background | `assets/js/anim/final-reveal.js` |
@@ -149,3 +149,33 @@ an invisible product.
 21st.dev): each word of the closing line wiped up from behind its own baseline.
 A clean cut, not a blur fade. It owns no copy; it re-cuts whatever the locale
 put on the page, and re-cuts it again on every language change.
+
+
+## The short edition
+
+The home page was 20.7 screens on desktop and 24.6 on a phone; the products
+section alone was 42% of it, and the first email address sat 23 phone-screens
+down. It is now 10.8 and 14.0, with contact reachable from the first frame at
+every width.
+
+Two structural consequences for anyone writing a module here:
+
+* `#statement` is gone as a section — the brand line folded into `#about` —
+  so the `OceanTransition` slot no longer exists. `#process` and
+  `#traceability` survive as ids on blocks inside `#quality`, which keeps the
+  anchors working; `ProcessAnimation` still has its stage there.
+* `#film` is emitted **only when `MEDIA["film"]` names a real file**. A module
+  that wants to draw into the film section must tolerate its absence — the
+  registry already does, since `slot()` simply returns nothing.
+
+`SpeciesIndex` is worth reading as the reference for a background module that
+enhances rendered content rather than drawing into its stage: it attaches its
+`insidus:rendered` listener before the first `prepare()` (the cold-load rule
+below), leaves its stage empty so the registry hands the height back, and
+degrades to a plain list of links when the file is deleted.
+
+One judgement it encodes: the pointer preview mounts **only** for a species
+that has a real photograph in `PRODUCT_MEDIA`. Enlarging the 200px working
+thumb would have given every row a preview today, and every one of them would
+have been a bad photograph presented as artwork. The row stays typographic
+until the real file lands.

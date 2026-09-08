@@ -11,12 +11,17 @@
 (function () {
 "use strict";
 
+/* Compressed for the short edition. The old sequence did not finish saying
+   what INSIDUS sells until 3.6s — on a page meant to convert, an intro that
+   makes the reader wait for the proposition is a cost, not an asset. The
+   whole thing now lands inside ~1.1s, and the two actions in the hero are in
+   the markup from the first frame regardless: this decorates, it never gates. */
 var SEQ = {
-  coord:  { at: 120,  step: 40 },
-  brand:  { at: 620,  step: 65 },   // per letter
-  line:   { at: 1500, step: 55 },   // per word
-  detail: { at: 2600, step: 160 },
-  cue:    { at: 3000, step: 0 }
+  coord:  { at:  60,  step: 22 },
+  brand:  { at: 180,  step: 34 },   // per letter
+  line:   { at: 420,  step: 30 },   // per word
+  detail: { at: 760,  step: 70 },
+  cue:    { at: 950,  step: 0 }
 };
 
 var CSS = [
@@ -251,6 +256,6 @@ function boot() {
 
 if (!boot()) {
   document.addEventListener("DOMContentLoaded", boot);
-  setTimeout(boot, 300);
+  setTimeout(boot, 120);
 }
 })();

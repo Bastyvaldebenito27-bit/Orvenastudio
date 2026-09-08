@@ -146,26 +146,33 @@ function Navbar(d) {
   }
   var mob = clear("#menu-list");
   if (mob) {
-    navItems(d).forEach(function (it, i) {
-      var li = el("li"), a = el("a");
-      a.href = it.href;
-      a.appendChild(el("span", "num", String(i + 1).padStart(2, "0")));
-      a.appendChild(el("span", null, it.label));
-      li.appendChild(a); mob.appendChild(li);
-    });
+    var root = PAGE === "product" ? BASE : "";
+    navItems(d).concat([{ label: d.nav.contact, href: root + "#contact" }])
+      .forEach(function (it, i) {
+        var li = el("li"), a = el("a");
+        a.href = it.href;
+        a.appendChild(el("span", "num", String(i + 1).padStart(2, "0")));
+        a.appendChild(el("span", null, it.label));
+        li.appendChild(a); mob.appendChild(li);
+      });
   }
   setText("#menu-open", d.nav.menu);
   setText("#menu-close", d.nav.close);
+  var cta = $("#nav-cta");
+  if (cta) {
+    cta.textContent = d.nav.contact;
+    if (PAGE === "product") cta.href = BASE + "#contact";
+  }
 }
+/* Four destinations, not six. Process folded into quality, and contact left
+   the list entirely — it is the button, always on screen. */
 function navItems(d) {
   var root = PAGE === "product" ? BASE : "";
   return [
-    { label: d.nav.about,    href: root + "#about" },
     { label: d.nav.products, href: root + "#products" },
+    { label: d.nav.about,    href: root + "#about" },
     { label: d.nav.quality,  href: root + "#quality" },
-    { label: d.nav.process,  href: root + "#process" },
-    { label: d.nav.global,   href: root + "#global" },
-    { label: d.nav.contact,  href: root + "#contact" }
+    { label: d.nav.global,   href: root + "#global" }
   ];
 }
 
@@ -192,6 +199,8 @@ function Hero(d) {
     claim.appendChild(document.createTextNode(d.hero.claim1));
     claim.appendChild(el("b", null, d.hero.claim2));
   }
+  setText("#hero-cta", d.ui.ctaQuote);
+  setText("#hero-alt", d.ui.ctaSpecies);
 }
 
 /* The statement: one sentence carrying the position, then the short reading
@@ -240,47 +249,71 @@ function AboutSection(d) {
   });
 }
 
+/* One species carries the editorial frame; the rest are an index that links
+   to the detail pages, where the full treatment already lives. Eight full
+   viewports of photography was 42% of the page and none of it exists yet. */
 function ProductShowcase(d) {
   setText("#products-kicker", d.products.kicker);
   setText("#products-title", d.products.title);
   setText("#products-lead", d.products.lead);
-  var host = clear("#products-list");
-  if (!host) return;
-  SPECIES.forEach(function (s) {
-    var art = el("article", "product js-rise");
 
-    /* The frame keeps its size whether or not the photograph exists, so
-       dropping artwork into PRODUCT_MEDIA never moves the layout. */
-    var media = el("div", "product__media");
-    var shot = (CFG.productMedia || {})[s.slug];
-    if (shot) {
-      var img = el("img");
-      img.src = shot;
-      img.alt = s.name + " — " + s.trade;
-      img.loading = "lazy"; img.decoding = "async";
-      media.appendChild(img);
-    } else {
-      media.appendChild(photoSlot(d, s.slug + ".jpg", "1600 \u00d7 2000", (CFG.thumbs || {})[s.slug], d.ui.reference));
-    }
+  var feat = clear("#products-featured");
+  if (feat && SPECIES.length) feat.appendChild(productCard(d, SPECIES[0], true));
 
-    var info = el("div");
-    var head = el("div", "product__num");
-    head.appendChild(el("span", "num", s.n));
-    head.appendChild(el("span", "tag", d.products.index));
-    info.appendChild(head);
-    info.appendChild(el("h3", "product__name", s.name));
-    info.appendChild(el("p", "product__trade", s.trade));
-    info.appendChild(el("p", "product__bino", s.bino));
-
-    var a = el("a", "product__cta");
+  var list = clear("#products-index-list");
+  if (!list) return;
+  setText("#products-index-kicker", d.ui.indexKicker);
+  SPECIES.slice(1).forEach(function (s) {
+    var li = el("li", "index__row js-rise");
+    var a = el("a", "index__link");
     a.href = BASE + "products/" + s.slug + "/" + langQuery();
-    a.appendChild(el("span", null, d.products.view));
-    a.appendChild(el("i", null, "\u2192"));
-    info.appendChild(a);
-
-    art.appendChild(media); art.appendChild(info);
-    host.appendChild(art);
+    a.setAttribute("data-slug", s.slug);
+    a.appendChild(el("span", "num index__n", s.n));
+    var t = el("span", "index__t");
+    t.appendChild(el("span", "index__name", s.name));
+    t.appendChild(el("span", "index__trade", s.trade));
+    a.appendChild(t);
+    a.appendChild(el("span", "index__bino", s.bino));
+    a.appendChild(el("i", "index__go", "\u2192"));
+    li.appendChild(a);
+    list.appendChild(li);
   });
+}
+
+/* The frame keeps its size whether or not the photograph exists, so dropping
+   artwork into PRODUCT_MEDIA never moves the layout. */
+function productCard(d, s, featured) {
+  var art = el("article", "product js-rise");
+  var media = el("div", "product__media");
+  var shot = (CFG.productMedia || {})[s.slug];
+  if (shot) {
+    var img = el("img");
+    img.src = shot;
+    img.alt = s.name + " \u2014 " + s.trade;
+    img.loading = "lazy"; img.decoding = "async";
+    media.appendChild(img);
+  } else {
+    media.appendChild(photoSlot(d, s.slug + ".jpg", "1600 \u00d7 2000",
+                                (CFG.thumbs || {})[s.slug], d.ui.reference));
+  }
+
+  var info = el("div");
+  var head = el("div", "product__num");
+  head.appendChild(el("span", "num", s.n));
+  head.appendChild(el("span", "tag", featured ? d.ui.featured : d.products.index));
+  info.appendChild(head);
+  info.appendChild(el("h3", "product__name", s.name));
+  info.appendChild(el("p", "product__trade", s.trade));
+  info.appendChild(el("p", "product__bino", s.bino));
+
+  var a = el("a", "product__cta");
+  a.href = BASE + "products/" + s.slug + "/" + langQuery();
+  a.appendChild(el("span", null, d.products.view));
+  a.appendChild(el("i", null, "\u2192"));
+  info.appendChild(a);
+
+  art.appendChild(media); art.appendChild(info);
+  return art;
 }
 
 /* A placeholder that says, on the page, exactly which file the frame wants —
@@ -306,6 +339,7 @@ function ProcessTimeline(d) {
   setText("#process-lead", d.process.lead);
   var host = clear("#process-list");
   if (!host) return;
+  host.classList.add("chain--grid");
   d.process.stages.forEach(function (st, i) {
     var row = el("div", "link js-rise");
     row.appendChild(el("span", "num", String(i + 1).padStart(2, "0")));
@@ -355,6 +389,7 @@ function PairsSection(prefix, block) {
   setText("#" + prefix + "-lead", block.lead);
   var host = clear("#" + prefix + "-list");
   if (!host) return;
+  host.classList.add("pairs--grid");
   block.items.forEach(function (it) {
     var row = el("div", "pair js-rise");
     row.appendChild(el("h3", "pair__t", it[0]));

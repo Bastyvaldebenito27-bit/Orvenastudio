@@ -694,8 +694,36 @@ EXTRA["ko"] = X(
  {"photoSlot": "사진 자리", "filmSlot": "영상 자리",
   "replace": "교체 예정", "reference": "참고 이미지"})
 
+# ---------------------------------------------------------------------------
+# The conversion layer: the two actions in the first frame, and the labels the
+# species index needs. Same additive shape as EXTRA — one table, nine rows, no
+# component edited. Still nothing asserted: these are actions and labels.
+# ---------------------------------------------------------------------------
+
+ACT = {
+ "es": ("Solicitar cotizacion", "Ver especies", "El resto del catalogo", "Destacado"),
+ "en": ("Request a quote", "See species", "The rest of the catalogue", "Featured"),
+ "zh": ("\u7d22\u53d6\u62a5\u4ef7", "\u67e5\u770b\u9c7c\u79cd", "\u5176\u4f59\u9c7c\u79cd", "\u91cd\u70b9"),
+ "fr": ("Demander une cotation", "Voir les especes", "Le reste du catalogue", "En vedette"),
+ "it": ("Richiedi un preventivo", "Vedi le specie", "Il resto del catalogo", "In evidenza"),
+ "de": ("Angebot anfordern", "Arten ansehen", "Das ubrige Sortiment", "Im Fokus"),
+ "pt": ("Solicitar cotacao", "Ver especies", "O resto do catalogo", "Destaque"),
+ "ja": ("\u898b\u7a4d\u3092\u4f9d\u983c", "\u9b5a\u7a2e\u3092\u898b\u308b", "\u305d\u306e\u4ed6\u306e\u9b5a\u7a2e", "\u6ce8\u76ee"),
+ "ko": ("\uacac\uc801 \uc694\uccad", "\uc5b4\uc885 \ubcf4\uae30", "\ub098\uba38\uc9c0 \uc5b4\uc885", "\uc8fc\uc694 \uc5b4\uc885"),
+}
+
+# accents the ASCII source above cannot carry, restored here
+ACT["es"] = ("Solicitar cotizaci\u00f3n", ACT["es"][1], "El resto del cat\u00e1logo", ACT["es"][3])
+ACT["fr"] = (ACT["fr"][0], "Voir les esp\u00e8ces", ACT["fr"][2], ACT["fr"][3])
+ACT["de"] = (ACT["de"][0], ACT["de"][1], "Das \u00fcbrige Sortiment", ACT["de"][3])
+ACT["pt"] = ("Solicitar cota\u00e7\u00e3o", "Ver esp\u00e9cies", "O resto do cat\u00e1logo", ACT["pt"][3])
+
 # fold the extra blocks in, and merge ui2 into the existing ui block
 for _l, _x in EXTRA.items():
     _x = dict(_x)
     C[_l]["ui"].update(_x.pop("ui2"))
     C[_l].update(_x)
+
+for _l, _a in ACT.items():
+    C[_l]["ui"].update({"ctaQuote": _a[0], "ctaSpecies": _a[1],
+                        "indexKicker": _a[2], "featured": _a[3]})

@@ -664,3 +664,126 @@ main,header,footer{ position:relative; z-index:1 }
   position:absolute; width:1px; height:1px; overflow:hidden;
   clip:rect(0 0 0 0); white-space:nowrap;
 }
+
+/* ===========================================================================
+   THE CONVERSION LAYER
+   Added for the short edition. Two actions in the first frame, a contact
+   button that never leaves the screen, and the species index that replaced
+   seven full-viewport frames.
+   =========================================================================== */
+
+/* --- buttons --------------------------------------------------------------
+   One shape, two weights. Not a SaaS pill: a rectangle with a hairline, the
+   same geometry as the rules that run through the rest of the page. */
+.btn{
+  display:inline-flex; align-items:center; gap:.7rem;
+  padding:1.05rem 1.9rem; border:1px solid var(--accent);
+  font-family:var(--sans); font-size:.82rem; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase; text-decoration:none;
+  transition:background .4s var(--ease), color .4s var(--ease),
+             border-color .4s var(--ease);
+}
+.btn--solid{ background:var(--accent); color:var(--abyss); border-color:var(--accent) }
+.btn--solid:hover{ background:var(--ice); border-color:var(--ice); color:var(--abyss) }
+.btn--ghost{ background:transparent; color:var(--ice); border-color:rgba(241,244,246,.32) }
+.btn--ghost:hover{ border-color:var(--accent); color:var(--accent) }
+
+.hero__acts{ display:flex; flex-wrap:wrap; gap:.9rem; margin-top:clamp(2rem,4.5vh,3.2rem) }
+@media (width < 520px){
+  .hero__acts{ gap:.7rem }
+  .hero__acts .btn{ flex:1 1 100%; justify-content:center; padding:1rem 1.2rem }
+}
+
+/* --- the contact button in the nav ---------------------------------------
+   It stays at every width, including under 1024px where the link list
+   collapses into the menu. That is the whole point of it. */
+.nav__cta{
+  display:inline-flex; align-items:center;
+  padding:.62rem 1.15rem; border:1px solid var(--accent); color:var(--accent);
+  font-family:var(--sans); font-size:.68rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase; text-decoration:none;
+  white-space:nowrap;
+  transition:background .35s var(--ease), color .35s var(--ease);
+}
+.nav__cta:hover{ background:var(--accent); color:var(--abyss) }
+@media (width < 420px){ .nav__cta{ padding:.55rem .8rem; font-size:.62rem; letter-spacing:.1em } }
+
+/* --- the species index ----------------------------------------------------
+   Seven rows where there were seven viewports. Typography and a rule, which
+   is the same instrument the process chain uses — no new visual language. */
+.index__kicker{ margin:clamp(3.5rem,7vh,5.5rem) 0 1.6rem }
+.index{ position:relative }
+.index__list{ list-style:none; margin:0; padding:0; border-top:1px solid var(--hairline) }
+.index__row{ border-bottom:1px solid var(--hairline) }
+.index__link{
+  /* Four columns, not three: the binomial and the arrow were both landing in
+     column 3, so the arrow wrapped to a second row and doubled the height of
+     every row in the index. */
+  display:grid; grid-template-columns:3.4rem 1fr auto 2rem; align-items:baseline;
+  gap:.35rem 1.4rem; padding:1.35rem 0; text-decoration:none; color:inherit;
+  transition:padding-left .5s var(--ease);
+}
+.index__link:hover{ padding-left:.9rem }
+.index__n{ color:var(--accent) }
+.index__t{ display:flex; flex-wrap:wrap; align-items:baseline; gap:.35rem .9rem }
+.index__name{
+  font-family:var(--display); font-size:clamp(1.35rem,.9rem+1.1vw,2.1rem);
+  line-height:1.05; color:var(--ice);
+  transition:color .4s var(--ease);
+}
+.index__link:hover .index__name{ color:var(--accent) }
+.index__trade{ font-family:var(--sans); font-size:.9rem; color:var(--fog) }
+.index__bino{ font-family:var(--mono); font-size:.74rem; color:var(--fog); font-style:italic }
+.index__bino{ grid-column:3; text-align:right }
+.index__go{
+  grid-column:4; justify-self:end; font-style:normal; color:var(--accent);
+  transition:transform .4s var(--ease);
+}
+.index__link:hover .index__go{ transform:translateX(8px) }
+@media (width < 700px){
+  .index__link{ grid-template-columns:2.6rem 1fr 1.6rem; gap:.25rem .9rem; padding:1.1rem 0 }
+  .index__bino{ grid-column:2; grid-row:2; text-align:left }
+  .index__go{ grid-column:3; grid-row:1 }
+}
+
+/* --- CONTROL: three movements under one heading --------------------------- */
+.sub{ margin-top:clamp(3.5rem,8vh,6rem) }
+.sub > .tag{ margin-bottom:2rem }
+
+/* --- the process chain, compacted ----------------------------------------
+   Eight stages stacked one under another was 1.4 screens on a phone for what
+   is, in the end, a sequence. Laid out as a grid it reads as a sequence at a
+   glance — which is what a chain is for — and every stage keeps its
+   description. The vertical rule becomes the top rule of each cell. */
+.chain--grid{ padding-left:0; display:grid; gap:0 clamp(1.5rem,3vw,3rem) }
+.chain--grid::before{ display:none }
+.chain--grid .link{
+  padding-block:clamp(1.1rem,2.6vh,1.7rem);
+  border-top:1px solid var(--hairline); grid-template-columns:1fr;
+  gap:.35rem;
+}
+.chain--grid .link + .link{ border-top:1px solid var(--hairline) }
+.chain--grid .link::before{
+  left:0; top:calc(clamp(1.1rem,2.6vh,1.7rem) * -1 - 3px);
+  width:100%; height:1px; background:var(--accent); border-radius:0;
+  transform:scaleX(0); transform-origin:left center;
+  transition:transform .8s var(--ease);
+}
+.chain--grid .link.is-in::before{ transform:scaleX(.16) }
+.chain--grid .link__t{ font-size:clamp(1.05rem,.85rem+.5vw,1.4rem) }
+.chain--grid .link__b{ grid-column:1; font-size:.86rem; max-width:34ch }
+@media (width >= 400px){ .chain--grid{ grid-template-columns:repeat(2,1fr) } }
+@media (width >= 1000px){ .chain--grid{ grid-template-columns:repeat(4,1fr) } }
+
+/* traceability: four records, two columns, no full-width rows */
+@media (width >= 700px){ .pairs--grid{ grid-template-columns:repeat(2,1fr); gap:0 clamp(1.5rem,3vw,3rem) } }
+
+/* On a phone the chain stays one column — two would wrap "Control de calidad"
+   into three lines and read worse than it saves. Tighter instead: the body
+   drops to caption size and the row loses its outer padding. Nothing is
+   hidden; a stage a buyer cares about is still on the page. */
+@media (width < 620px){
+  .chain--grid .link{ padding-block:.85rem }
+  .chain--grid .link__t{ font-size:1.02rem }
+  .chain--grid .link__b{ font-size:.8rem; line-height:1.5; max-width:none }
+}

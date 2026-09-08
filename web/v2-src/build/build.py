@@ -19,7 +19,7 @@ ASSETS = os.path.join(ROOT, "assets")
 
 # animation modules, in load order; each one is optional by contract
 ANIM = ["cinematic-intro.js", "global-map.js", "hero-field.js",
-        "product-reveal.js", "final-reveal.js"]
+        "product-reveal.js", "final-reveal.js", "species-index.js"]
 # Assets and locales can be served from elsewhere; the pages and their links
 # stay where they are. Empty means everything is served from the same origin.
 CDN = os.environ.get("INSIDUS_CDN", "").rstrip("/")
@@ -105,6 +105,9 @@ NAV = """
         <button class="lang__btn" id="lang-btn" type="button" aria-haspopup="true" aria-expanded="false"></button>
         <div class="lang__menu" id="lang-menu" role="menu"></div>
       </div>
+      <!-- Reachable from anywhere, at every width. The buyer used to have to
+           reach screen 23 on a phone before an address appeared. -->
+      <a class="nav__cta" id="nav-cta" href="{home}#contact"></a>
       <button class="nav__toggle" id="menu-open" type="button" aria-expanded="false" aria-controls="menu"></button>
     </div>
   </div>
@@ -186,11 +189,39 @@ def media_layer(key, label_id=None, want_dims=""):
             f'<span class="ph__d">{want_dims}</span></div>')
 
 
+FILM_SECTION = """
+<!-- ................................................... CINEMATIC FILM
+     A scene, not a banner: full bleed, no player chrome. This section is
+     emitted only when MEDIA["film"] names a real file — a placeholder the
+     size of a viewport is a screen of nothing on a page meant to convert.
+     Drop the footage in and it comes back on the next build. -->
+<section class="film" id="film">
+  <div class="film__media" data-media="film">{FILM_MEDIA}</div>
+  <div class="film__scrim" aria-hidden="true"></div>
+  <div class="film__in">
+    <div class="shell">
+      <p class="tag tag--accent" id="film-kicker"></p>
+      <p class="film__line" id="film-line"></p>
+      <p class="tag film__note" id="film-note"></p>
+    </div>
+  </div>
+</section>
+"""
+
+
+def has_film():
+    m = MEDIA["film"]
+    return bool(m["video"] or m["image"])
+
+
 def home_main(base):
-    """HOME_MAIN with its two media frames resolved for this build target."""
+    """HOME_MAIN with its media frames resolved for this build target."""
+    film = (FILM_SECTION.replace(
+        "{FILM_MEDIA}", media_layer("film", "film-slot", "1920 \u00d7 1080"))
+        if has_film() else "")
     return (HOME_MAIN
             .replace("{HERO_MEDIA}", media_layer("hero"))
-            .replace("{FILM_MEDIA}", media_layer("film", "film-slot", "1920 \u00d7 1080"))
+            .replace("{FILM_SECTION}", film)
             .replace("{BASE}", base))
 
 
@@ -224,6 +255,13 @@ HOME_MAIN = """
       <p class="hero__eyebrow coord"><i></i><span id="hero-eyebrow"></span></p>
       <h1 class="hero__brand">INSIDUS</h1>
       <p class="hero__claim" id="hero-claim"></p>
+      <!-- The proposition is one click from the first frame, not nineteen
+           screens down. Both actions are in the markup from the start: the
+           intro animation decorates around them, it never gates them. -->
+      <div class="hero__acts">
+        <a class="btn btn--solid" id="hero-cta" href="#contact"></a>
+        <a class="btn btn--ghost" id="hero-alt" href="#products"></a>
+      </div>
     </div>
   </div>
   <div class="hero__foot">
@@ -234,24 +272,37 @@ HOME_MAIN = """
   </div>
 </section>
 
-<!-- 02 ............................................. BRAND STATEMENT -->
-<section class="statement" id="statement" data-anim-slot="OceanTransition">
-  <div class="slot" aria-hidden="true"></div>
-  <div class="statement__in">
-    <div class="shell">
-      <p class="tag tag--accent" id="statement-kicker"></p>
-      <p class="statement__line" id="statement-line"></p>
-      <div class="statement__grid">
-        <h2 class="display h-sm upper" id="statement-title"></h2>
-        <p class="statement__body" id="statement-body"></p>
-      </div>
+<!-- 02 ........................................................ PRODUCTS
+     One species carries the editorial frame; the other seven are an index.
+     The full treatment did not disappear — it lives on /products/<slug>/,
+     which is where a buyer who is actually interested goes. -->
+<section class="band band--deep" id="products">
+  <div class="shell">
+    <div class="products__head">
+      <p class="tag tag--accent" id="products-kicker"></p>
+      <h2 class="display h-sec upper" id="products-title"></h2>
+      <p class="lead" id="products-lead"></p>
+    </div>
+  </div>
+  <div class="anim-stage" id="product-animation" data-anim-slot="ProductAnimation">
+    <div class="slot" aria-hidden="true"></div>
+  </div>
+  <div class="shell" id="products-featured"></div>
+  <div class="shell">
+    <p class="tag index__kicker" id="products-index-kicker"></p>
+    <div class="index" id="products-index" data-anim-slot="SpeciesIndex">
+      <div class="slot" aria-hidden="true"></div>
+      <ol class="index__list" id="products-index-list"></ol>
     </div>
   </div>
 </section>
 
-<!-- ............................................................ ABOUT -->
+<!-- 03 ........................................................... ABOUT
+     The brand statement folded in as the opening line: it was a section of
+     its own saying, at length, what this one sentence says. -->
 <section class="band" id="about">
   <div class="shell">
+    <p class="statement__line" id="statement-line"></p>
     <div class="about__grid">
       <div class="about__meta">
         <p class="tag" id="about-kicker"></p>
@@ -264,77 +315,38 @@ HOME_MAIN = """
   </div>
 </section>
 
-<!-- 03 ........................................................ PRODUCTS -->
-<section class="band band--deep" id="products">
-  <div class="shell">
-    <div class="products__head">
-      <p class="tag tag--accent" id="products-kicker"></p>
-      <h2 class="display h-sec upper" id="products-title"></h2>
-      <p class="lead" id="products-lead"></p>
-    </div>
-  </div>
-  <div class="anim-stage" id="product-animation" data-anim-slot="ProductAnimation">
-    <div class="slot" aria-hidden="true"></div>
-  </div>
-  <div class="shell" id="products-list"></div>
-</section>
+{FILM_SECTION}
 
-<!-- 04 ................................................. CINEMATIC FILM
-     A scene, not a banner: full bleed, no player chrome. Drop the file into
-     MEDIA["film"] and this becomes an autoplaying, muted, looping frame. -->
-<section class="film" id="film">
-  <div class="film__media" data-media="film">{FILM_MEDIA}</div>
-  <div class="film__scrim" aria-hidden="true"></div>
-  <div class="film__in">
-    <div class="shell">
-      <p class="tag tag--accent" id="film-kicker"></p>
-      <p class="film__line" id="film-line"></p>
-      <p class="tag film__note" id="film-note"></p>
-    </div>
-  </div>
-</section>
-
-<!-- 05 ......................................................... QUALITY -->
-<section class="band" id="quality">
+<!-- 04 ......................................................... CONTROL
+     Quality, process and traceability were three bands with three headings
+     and three leads telling one story. One heading now, three movements
+     under it. The anchors survive as ids on the blocks. -->
+<section class="band band--deep" id="quality">
   <div class="shell">
     <div class="head">
-      <p class="tag" id="quality-kicker"></p>
+      <p class="tag tag--accent" id="quality-kicker"></p>
       <h2 class="display h-sec upper" id="quality-title"></h2>
       <p class="lead" id="quality-lead"></p>
     </div>
     <div class="quals" id="quality-list"></div>
   </div>
-</section>
-
-<!-- 06 ......................................................... PROCESS -->
-<section class="band band--deep" id="process">
-  <div class="shell">
-    <div class="head">
-      <p class="tag tag--accent" id="process-kicker"></p>
-      <h2 class="display h-sec upper" id="process-title"></h2>
-      <p class="lead" id="process-lead"></p>
-    </div>
-  </div>
   <div class="anim-stage" id="process-animation" data-anim-slot="ProcessAnimation">
     <div class="slot" aria-hidden="true"></div>
   </div>
-  <div class="shell"><div class="chain" id="process-list"></div></div>
-</section>
-
-<!-- ..................................................... TRACEABILITY -->
-<section class="band band--tight" id="traceability">
   <div class="shell">
-    <div class="head">
-      <p class="tag" id="trace-kicker"></p>
-      <h2 class="display h-md upper" id="trace-title"></h2>
-      <p class="lead" id="trace-lead"></p>
+    <div class="sub" id="process">
+      <p class="tag" id="process-kicker"></p>
+      <div class="chain" id="process-list"></div>
     </div>
-    <div class="pairs" id="trace-list"></div>
+    <div class="sub" id="traceability">
+      <p class="tag" id="trace-kicker"></p>
+      <div class="pairs" id="trace-list"></div>
+    </div>
   </div>
 </section>
 
-<!-- 07 .................................................... GLOBAL REACH -->
-<section class="band band--deep" id="global">
+<!-- 05 .................................................... GLOBAL REACH -->
+<section class="band" id="global">
   <div class="shell">
     <div class="head">
       <p class="tag" id="reach-kicker"></p>
@@ -354,8 +366,11 @@ HOME_MAIN = """
   </div>
 </section>
 
-<!-- 08 ................................................. B2B POSITIONING -->
-<section class="band" id="partnership">
+<!-- 06 ......................................... CLOSER: B2B + LAST WORD
+     The B2B position and the closing line were two sections that both said
+     "work with us". They close together now, one step above the form. -->
+<section class="final" id="final-animation" data-anim-slot="FinalAnimation">
+  <div class="slot" aria-hidden="true"></div>
   <div class="shell">
     <div class="head">
       <p class="tag tag--accent" id="partners-kicker"></p>
@@ -363,15 +378,8 @@ HOME_MAIN = """
       <p class="lead" id="partners-lead"></p>
     </div>
     <div class="partners" id="partners-list"></div>
-  </div>
-</section>
-
-<!-- 09 ..................................................... FINAL MOMENT -->
-<section class="final" id="final-animation" data-anim-slot="FinalAnimation">
-  <div class="slot" aria-hidden="true"></div>
-  <div class="shell">
     <p class="final__line display" id="final-line"></p>
-    <a class="product__cta" id="final-cta" href="#contact" style="margin-top:3rem"></a>
+    <a class="btn btn--solid" id="final-cta" href="#contact"></a>
   </div>
 </section>
 
