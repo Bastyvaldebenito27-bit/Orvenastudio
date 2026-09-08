@@ -341,7 +341,11 @@ main,header,footer{ position:relative; z-index:1 }
   .product:nth-child(even) .product__media{ order:2 }
 }
 .product__media{
-  position:relative; overflow:hidden; background:var(--navy);
+  /* width:100% is not decoration: with only aspect-ratio and a min-height, a
+     narrow column lets the height drive the width — at 390px the frame came
+     out 419px wide and pushed the whole page sideways. Pinning the width
+     makes the ratio a floor for the height instead. */
+  position:relative; width:100%; overflow:hidden; background:var(--navy);
   aspect-ratio:4/5; min-height:clamp(320px, 62svh, 760px);
 }
 .product__media > img{ width:100%; height:100%; object-fit:cover }
@@ -501,7 +505,9 @@ main,header,footer{ position:relative; z-index:1 }
   line-height:1; text-transform:uppercase; letter-spacing:-.01em;
   margin:0 auto; color:var(--ice); max-width:16ch;
 }
-.final__line span{ color:var(--fog) }
+/* Bound to a class, not to `span`: a module that wraps the words to animate
+   them would otherwise inherit this tint and flatten the two-tone line. */
+.final__line .final__lead{ color:var(--fog) }
 
 /* ============================== CONTACT ================================ */
 .contact__grid{ display:grid; gap:clamp(2.5rem,5vw,5rem); grid-template-columns:1fr }

@@ -18,7 +18,8 @@ DIST = os.path.join(ROOT, "dist")
 ASSETS = os.path.join(ROOT, "assets")
 
 # animation modules, in load order; each one is optional by contract
-ANIM = ["cinematic-intro.js", "global-map.js", "hero-field.js"]
+ANIM = ["cinematic-intro.js", "global-map.js", "hero-field.js",
+        "product-reveal.js", "final-reveal.js"]
 # Assets and locales can be served from elsewhere; the pages and their links
 # stay where they are. Empty means everything is served from the same origin.
 CDN = os.environ.get("INSIDUS_CDN", "").rstrip("/")

@@ -386,7 +386,7 @@ function GlobalReach(d) {
 function FinalMoment(d) {
   var line = clear("#final-line");
   if (line) {
-    line.appendChild(el("span", null, d.final.line1 + " "));
+    line.appendChild(el("span", "final__lead", d.final.line1 + " "));
     line.appendChild(document.createTextNode(d.final.line2));
   }
   setText("#final-cta", d.final.cta);
@@ -596,11 +596,16 @@ INSIDUS.anim = (function () {
       if (!stage) return;
       mounted[name] = true;
       var host = this.section(name);
-      if (host && host.classList.contains("anim-stage")) host.classList.add("is-live");
+      var stageKind = host && host.classList.contains("anim-stage");
+      if (stageKind) host.classList.add("is-live");
       try {
         mods[name]({ stage: stage, section: this.section(name),
                      reduce: REDUCE, lang: INSIDUS.lang, dict: INSIDUS.dict });
       } catch (e) { mounted[name] = false; console.error("[insidus.anim]", name, e); }
+      /* A stage earns its height by being used. A module may register for a
+         slot and enhance the section around it instead of drawing into the
+         stage; without this it would leave a 60svh hole in the page. */
+      if (stageKind && !stage.children.length) host.classList.remove("is-live");
     },
     _mountAll: function () { for (var k in mods) this._mount(k); },
     names: function () { return $$("[data-anim-slot]").map(function (n) { return n.getAttribute("data-anim-slot"); }); }

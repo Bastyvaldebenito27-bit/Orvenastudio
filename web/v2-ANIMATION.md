@@ -34,10 +34,10 @@ descendant lookup would hand the outer module the inner stage.
 | `CinematicIntro` | `#hero` | background | `assets/js/anim/cinematic-intro.js` |
 | `HeroField` | `.hero__media` | background | `assets/js/anim/hero-field.js` |
 | `OceanTransition` | `#statement` | background | free |
-| `ProductAnimation` | `#product-animation` | stage | free |
+| `ProductAnimation` | `#product-animation` | stage | `assets/js/anim/product-reveal.js` |
 | `ProcessAnimation` | `#process-animation` | stage | free |
 | `GlobalMap` | `#global-map` | background | `assets/js/anim/global-map.js` |
-| `FinalAnimation` | `#final-animation` | background | free |
+| `FinalAnimation` | `#final-animation` | background | `assets/js/anim/final-reveal.js` |
 
 **Background** stages are absolutely positioned behind the section's own
 content, which stays legible on top. In `#hero` the stage sits *above* the
@@ -45,8 +45,10 @@ scrim, so a module draws into the picture rather than under the dimming layer. D
 particle field, a shader.
 
 **Stage** stages occupy **zero height** until a module mounts. On mount the
-registry adds `.is-live` and the section opens to roughly 60svh. This is why
-the page has no empty gaps today.
+registry adds `.is-live` and the section opens to roughly 60svh — but only if
+the module actually put something in the stage. A module may register for a
+slot and enhance the section around it instead; the height is then given back,
+so registering never costs the page an empty gap.
 
 A `.slot` already stretches any `canvas`, `video`, `svg` or `iframe` you put
 inside it to fill the stage with `object-fit: cover`.
@@ -62,6 +64,10 @@ inside it to fill the stage with `object-fit: cover`.
 4. **Re-render is not re-mount.** Changing language re-renders the content and
    fires `insidus:rendered` on `document`; your module keeps running. Listen
    for it if a label inside your animation needs to follow the language.
+   **A module that touches rendered content must listen for it**, not merely
+   read the DOM at mount: locales arrive by `fetch`, so on a cold load your
+   module can mount before a single product exists — and the registry mounts
+   each name exactly once, so there is no second chance.
 5. **Mobile.** Check `matchMedia` yourself and drop to something cheaper —
    the stage does not decide for you.
 
@@ -129,3 +135,17 @@ film. Without WebGL2, or if a shader fails to compile, it does not mount and
 the waiting-placeholder stays. Device pixel ratio is capped at 1.5 (1.25 under
 700px); the loop runs only while the frame is on screen and the tab visible;
 under reduced motion it paints one frame and stops.
+
+**`product-reveal.js`** — the gesture of `parallax-image` (@pulkitxm on
+21st.dev), rewritten in vanilla: a scroll-linked vertical shift on the
+photograph, paired with a clip-path mask that opens upward and a 1.06 settle.
+It draws nothing into its stage — the eight frames already exist — so
+`#product-animation` stays closed. Three layers per frame, because the mask,
+the settle and the parallax must not share a transform. A frame plainly inside
+the viewport opens even if the observer never delivered: a mask stuck shut is
+an invisible product.
+
+**`final-reveal.js`** — the gesture of `vertical-cut-reveal` (@danielpetho on
+21st.dev): each word of the closing line wiped up from behind its own baseline.
+A clean cut, not a blur fade. It owns no copy; it re-cuts whatever the locale
+put on the page, and re-cuts it again on every language change.
