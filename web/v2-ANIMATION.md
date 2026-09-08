@@ -35,7 +35,7 @@ descendant lookup would hand the outer module the inner stage.
 | `HeroField` | `.hero__media` | background | `assets/js/anim/hero-field.js` |
 | `ProductAnimation` | `#product-animation` | stage | `assets/js/anim/product-reveal.js` |
 | `SpeciesIndex` | `#products-index` | background | `assets/js/anim/species-index.js` |
-| `ProcessAnimation` | `#process-animation` | stage | free |
+| `ProcessAnimation` | `#process-animation` | stage | `assets/js/anim/process-chain.js` |
 | `GlobalMap` | `#global-map` | background | `assets/js/anim/global-map.js` |
 | `FinalAnimation` | `#final-animation` | background | `assets/js/anim/final-reveal.js` |
 
@@ -179,3 +179,24 @@ that has a real photograph in `PRODUCT_MEDIA`. Enlarging the 200px working
 thumb would have given every row a preview today, and every one of them would
 have been a bad photograph presented as artwork. The row stays typographic
 until the real file lands.
+
+
+## ProcessAnimation
+
+The chain's accent rules are drawn by the stylesheet off core `js-rise`, with
+no module involved — so `process-chain.js` had to add what CSS cannot:
+
+* the stage numbers count up as each cell arrives (eight counters in sequence
+  read as a line moving, which is what a process is);
+* a hairline spans each grid row behind the cells, drawn left to right, so the
+  eight stages read as one chain rather than eight boxes.
+
+It builds the rails from where the cells actually landed rather than from a
+hard-coded column count, and rebuilds them on resize — the grid is 1, 2 or 4
+columns across three breakpoints, and a rail measured for one of them is
+visibly wrong in the other two.
+
+Like `SpeciesIndex` it leaves its stage empty, so the registry hands the height
+back. Under reduced motion the counters are written at their final value and no
+rail is created at all; a counter stuck at `00` because the animation did not
+get to run would be worse than no animation.

@@ -19,7 +19,8 @@ ASSETS = os.path.join(ROOT, "assets")
 
 # animation modules, in load order; each one is optional by contract
 ANIM = ["cinematic-intro.js", "global-map.js", "hero-field.js",
-        "product-reveal.js", "final-reveal.js", "species-index.js"]
+        "product-reveal.js", "final-reveal.js", "species-index.js",
+        "process-chain.js"]
 # Assets and locales can be served from elsewhere; the pages and their links
 # stay where they are. Empty means everything is served from the same origin.
 CDN = os.environ.get("INSIDUS_CDN", "").rstrip("/")
@@ -85,6 +86,7 @@ def head(title, desc, css_href, extra=""):
 <meta name="description" content="{desc}">
 <meta property="og:site_name" content="INSIDUS">
 <meta name="theme-color" content="#04070B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%2304070B%27/%3E%3Crect x=%2714.6%27 y=%278%27 width=%272.8%27 height=%2716%27 fill=%27%23F1F4F6%27/%3E%3Crect x=%278%27 y=%278%27 width=%2716%27 height=%271.6%27 fill=%27%23A9C3D4%27/%3E%3Crect x=%278%27 y=%2722.4%27 width=%2716%27 height=%271.6%27 fill=%27%23A9C3D4%27/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
