@@ -308,6 +308,7 @@ function productCard(d, s, featured) {
 
   var a = el("a", "product__cta");
   a.href = BASE + "products/" + s.slug + "/" + langQuery();
+  a.setAttribute("data-slug", s.slug);
   a.appendChild(el("span", null, d.products.view));
   a.appendChild(el("i", null, "\u2192"));
   info.appendChild(a);
@@ -594,6 +595,16 @@ function render(lang, d) {
   document.dispatchEvent(new CustomEvent("insidus:rendered", { detail: { lang: lang, dict: d } }));
 }
 
+/* Nine languages, and switching one used to repaint the whole page in a
+   single frame — every heading, every label, every row swapped at once. The
+   content is the same content; only the words change, so it crosses over.
+   The API does the work where it exists and the plain call runs everywhere
+   else, which means this is a one-line difference, not a code path. */
+function swap(apply) {
+  if (REDUCE || typeof document.startViewTransition !== "function") return apply();
+  try { document.startViewTransition(apply); } catch (e) { apply(); }
+}
+
 function setLang(lang, push) {
   if (LANGS.indexOf(lang) < 0) return;
   try { localStorage.setItem(STORE, lang); } catch (e) {}
@@ -604,7 +615,7 @@ function setLang(lang, push) {
       history.replaceState(null, "", u.pathname + u.search + u.hash);
     } catch (e) {}
   }
-  loadLocale(lang).then(function (d) { render(lang, d); })
+  loadLocale(lang).then(function (d) { swap(function () { render(lang, d); }); })
     .catch(function (err) { console.error("[insidus]", err); });
 }
 INSIDUS.setLang = setLang;

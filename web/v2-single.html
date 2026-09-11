@@ -793,6 +793,42 @@ main,header,footer{ position:relative; z-index:1 }
   .chain--grid .link__b{ font-size:.8rem; line-height:1.5; max-width:none }
 }
 
+/* ===================== BETWEEN PAGES, AND BETWEEN LANGUAGES ===============
+   Two moments where the site used to cut hard: clicking a species in the
+   index, and switching language. Both are the same gesture underneath — the
+   page changes but the subject does not — so both get a transition instead of
+   a flash. Progressive by construction: a browser without view transitions
+   navigates and re-renders exactly as before, and nothing here is required
+   for the page to work. */
+@view-transition{ navigation:auto }
+
+/* The whole page crosses over quickly. Long enough to read as continuity,
+   short enough that nobody waits for it: a buyer clicking a species wants the
+   species, not the animation. */
+::view-transition-old(root),
+::view-transition-new(root){ animation-duration:.26s; animation-timing-function:var(--ease) }
+
+/* The species name and its number travel. They are the one thing genuinely
+   shared by the two pages, so they move rather than fade — the index row
+   becomes the hero. Names are assigned in JS, on the row actually clicked,
+   because a name must be unique on the page: tagging all seven rows up front
+   would leave six orphans animating on their own. */
+::view-transition-group(sp-title),
+::view-transition-group(sp-num){ animation-duration:.5s; animation-timing-function:var(--ease) }
+::view-transition-old(sp-title),
+::view-transition-new(sp-title),
+::view-transition-old(sp-num),
+::view-transition-new(sp-num){ animation-duration:.32s; mix-blend-mode:normal }
+
+/* Reduced motion keeps the continuity and drops the travel: the transition
+   resolves in the next frame instead of being cancelled, so the page never
+   lands mid-snapshot. */
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*){ animation-duration:.001s !important }
+}
+
 </style>
 
 <div class="gridlines" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
@@ -1327,6 +1363,7 @@ function productCard(d, s, featured) {
 
   var a = el("a", "product__cta");
   a.href = BASE + "products/" + s.slug + "/" + langQuery();
+  a.setAttribute("data-slug", s.slug);
   a.appendChild(el("span", null, d.products.view));
   a.appendChild(el("i", null, "\u2192"));
   info.appendChild(a);
@@ -1613,6 +1650,16 @@ function render(lang, d) {
   document.dispatchEvent(new CustomEvent("insidus:rendered", { detail: { lang: lang, dict: d } }));
 }
 
+/* Nine languages, and switching one used to repaint the whole page in a
+   single frame — every heading, every label, every row swapped at once. The
+   content is the same content; only the words change, so it crosses over.
+   The API does the work where it exists and the plain call runs everywhere
+   else, which means this is a one-line difference, not a code path. */
+function swap(apply) {
+  if (REDUCE || typeof document.startViewTransition !== "function") return apply();
+  try { document.startViewTransition(apply); } catch (e) { apply(); }
+}
+
 function setLang(lang, push) {
   if (LANGS.indexOf(lang) < 0) return;
   try { localStorage.setItem(STORE, lang); } catch (e) {}
@@ -1623,7 +1670,7 @@ function setLang(lang, push) {
       history.replaceState(null, "", u.pathname + u.search + u.hash);
     } catch (e) {}
   }
-  loadLocale(lang).then(function (d) { render(lang, d); })
+  loadLocale(lang).then(function (d) { swap(function () { render(lang, d); }); })
     .catch(function (err) { console.error("[insidus]", err); });
 }
 INSIDUS.setLang = setLang;
@@ -3437,6 +3484,97 @@ INSIDUS.anim.register("ContactAnimation", function (ctx) {
   document.addEventListener("insidus:rendered", prepare);
   prepare();
 });
+})();
+
+/* =========================================================================
+   PageTransition — the index row becomes the product hero.
+
+   Clicking a species used to be a hard cut: the index disappears, the ficha
+   appears, and the buyer has to find their place again. The species name and
+   its number are the one thing the two pages genuinely share, so they travel
+   between them and the rest of the page crosses over behind.
+
+   This is the only module that is not a slot: it has nothing to draw, it
+   enhances a navigation. It carries no markup, no styles of its own and no
+   state — the stylesheet holds the timings, and all this file does is say
+   which two elements are the same subject, a moment before the browser
+   navigates.
+
+   Nothing here is required. A browser without view transitions navigates as
+   it always did; delete the file and so does every browser.
+   ========================================================================= */
+(function () {
+"use strict";
+
+var W = window, D = document;
+
+/* Cross-document transitions are driven by the stylesheet's @view-transition,
+   not from here. Without support for the naming property there is nothing
+   this file can usefully say, so it stands down rather than tagging elements
+   no engine will read. */
+if (!W.CSS || !CSS.supports || !CSS.supports("view-transition-name", "x")) return;
+if (W.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+var TITLE = "sp-title", NUM = "sp-num";
+
+/* A view-transition-name has to be unique in the document. The index holds
+   seven rows and the featured card an eighth: tagging them all would leave
+   seven subjects animating alone. So the tag is applied to one row — the one
+   actually clicked — and cleared again on the way back. */
+function untag() {
+  var tagged = D.querySelectorAll("[data-vt]");
+  for (var i = 0; i < tagged.length; i++) {
+    tagged[i].style.viewTransitionName = "";
+    tagged[i].removeAttribute("data-vt");
+  }
+}
+
+function tag(node, name) {
+  if (!node) return;
+  node.style.viewTransitionName = name;
+  node.setAttribute("data-vt", name);
+}
+
+/* Both shapes that link to a ficha: the index row and the featured card.
+   The link is the anchor in either case, but the name and number sit beside
+   it in the card and inside it in the row, so the search starts from
+   whichever container holds them. */
+function subject(link) {
+  return link.closest(".index__row") || link.closest(".product") || link;
+}
+
+D.addEventListener("click", function (e) {
+  var link = e.target.closest && e.target.closest("a[data-slug]");
+  if (!link) return;
+  /* Let the browser keep its own behaviour for anything that is not a plain
+     left-click: a new tab has no transition to run. */
+  if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  var host = subject(link);
+  untag();
+  tag(host.querySelector(".index__name, .product__name"), TITLE);
+  tag(host.querySelector(".num"), NUM);
+}, true);
+
+/* The ficha's side of the pair. #p-name and #p-num survive re-rendering —
+   only their text is replaced — but a language switch re-runs render, so the
+   tag is re-applied on every render rather than once at load. */
+function tagProduct() {
+  if (D.body.getAttribute("data-page") !== "product") return;
+  untag();
+  tag(D.getElementById("p-name"), TITLE);
+  tag(D.getElementById("p-num"), NUM);
+}
+tagProduct();
+D.addEventListener("insidus:rendered", tagProduct);
+
+/* Coming back from a ficha, the home page may be served from the back-forward
+   cache with the tag still on the row that was clicked. Left there it would
+   claim the name on the next navigation, whichever row is clicked then. */
+W.addEventListener("pageshow", function (e) {
+  if (!e.persisted) return;
+  if (D.body.getAttribute("data-page") === "product") tagProduct(); else untag();
+});
+
 })();
 
 </script>

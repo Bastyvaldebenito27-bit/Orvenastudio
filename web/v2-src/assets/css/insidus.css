@@ -787,3 +787,39 @@ main,header,footer{ position:relative; z-index:1 }
   .chain--grid .link__t{ font-size:1.02rem }
   .chain--grid .link__b{ font-size:.8rem; line-height:1.5; max-width:none }
 }
+
+/* ===================== BETWEEN PAGES, AND BETWEEN LANGUAGES ===============
+   Two moments where the site used to cut hard: clicking a species in the
+   index, and switching language. Both are the same gesture underneath — the
+   page changes but the subject does not — so both get a transition instead of
+   a flash. Progressive by construction: a browser without view transitions
+   navigates and re-renders exactly as before, and nothing here is required
+   for the page to work. */
+@view-transition{ navigation:auto }
+
+/* The whole page crosses over quickly. Long enough to read as continuity,
+   short enough that nobody waits for it: a buyer clicking a species wants the
+   species, not the animation. */
+::view-transition-old(root),
+::view-transition-new(root){ animation-duration:.26s; animation-timing-function:var(--ease) }
+
+/* The species name and its number travel. They are the one thing genuinely
+   shared by the two pages, so they move rather than fade — the index row
+   becomes the hero. Names are assigned in JS, on the row actually clicked,
+   because a name must be unique on the page: tagging all seven rows up front
+   would leave six orphans animating on their own. */
+::view-transition-group(sp-title),
+::view-transition-group(sp-num){ animation-duration:.5s; animation-timing-function:var(--ease) }
+::view-transition-old(sp-title),
+::view-transition-new(sp-title),
+::view-transition-old(sp-num),
+::view-transition-new(sp-num){ animation-duration:.32s; mix-blend-mode:normal }
+
+/* Reduced motion keeps the continuity and drops the travel: the transition
+   resolves in the next frame instead of being cancelled, so the page never
+   lands mid-snapshot. */
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*){ animation-duration:.001s !important }
+}

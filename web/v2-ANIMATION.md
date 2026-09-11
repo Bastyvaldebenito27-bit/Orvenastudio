@@ -233,3 +233,47 @@ Two things worth knowing if you touch this section:
 * the direct rows are rebuilt on every language change, so they are marked
   and re-observed on each `insidus:rendered`; the fields are not, so their
   listeners are bound once and guarded by a class check.
+
+## PageTransition, and the one module that is not a slot
+
+Everything above draws into a stage. This one does not: it has no markup, no
+styles of its own and nothing to render. It names two elements and gets out
+of the way.
+
+Two moments on this site used to cut hard. Clicking a species in the index
+replaced the page in one frame, and the buyer had to find their place in the
+ficha from scratch. Switching language repainted every heading, label and row
+at once. Both are the same situation underneath — the page changes, the
+subject does not — so both now cross over.
+
+**Between pages.** `@view-transition { navigation: auto }` in the stylesheet
+turns same-origin navigation into a transition; the browser does the work.
+What it cannot know is which two elements are the same thing, and that is all
+`page-transition.js` says: the species name and its number travel from the
+index row to the hero of the ficha.
+
+The tag goes on one row — the one actually clicked — and not on all of them.
+A `view-transition-name` has to be unique in the document, so tagging seven
+index rows and the featured card up front would leave seven subjects
+animating alone. The module tags on click, clears on the way back, and
+re-tags the ficha's side on every `insidus:rendered` so a language switch
+does not leave the pair broken.
+
+`ANIM_PRODUCT` grew for the same reason `ContactAnimation` put it there: the
+module has to run on both ends of the navigation, or the name that leaves the
+index has nothing to pair with when the ficha arrives.
+
+**Between languages.** `setLang` wraps its render in `startViewTransition`
+where the browser has it and calls the same function directly where it does
+not — a one-line difference, not a second code path. The nine locales, the
+markup and the registry are untouched.
+
+Both stand down under `prefers-reduced-motion`: the module returns before
+tagging anything, and the stylesheet collapses every view-transition
+animation to the next frame rather than cancelling it, so the page never
+lands mid-snapshot.
+
+This is the most disposable module in the set, by construction. A browser
+without view transitions navigates and re-renders exactly as it did before —
+no fallback, because there is nothing to fall back from. Delete the file and
+every browser behaves that way.

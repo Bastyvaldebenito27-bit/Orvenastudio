@@ -20,12 +20,15 @@ ASSETS = os.path.join(ROOT, "assets")
 # animation modules, in load order; each one is optional by contract
 ANIM = ["cinematic-intro.js", "global-map.js", "hero-field.js",
         "product-reveal.js", "final-reveal.js", "species-index.js",
-        "process-chain.js", "contact-form.js"]
+        "process-chain.js", "contact-form.js", "page-transition.js"]
 
 # A product page carries only the modules whose sections it actually has.
 # Contact is the one section shared with the home page; the rest would be
 # dead weight, and a module with no slot simply never mounts anyway.
-ANIM_PRODUCT = ["contact-form.js"]
+# page-transition is the other half of the index-to-ficha travel: the
+# module has to run on both ends of the navigation or the name has
+# nothing to pair with when the ficha arrives.
+ANIM_PRODUCT = ["contact-form.js", "page-transition.js"]
 # Assets and locales can be served from elsewhere; the pages and their links
 # stay where they are. Empty means everything is served from the same origin.
 CDN = os.environ.get("INSIDUS_CDN", "").rstrip("/")
