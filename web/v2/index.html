@@ -6,12 +6,13 @@
 <title>INSIDUS — From the Chilean Pacific to the world</title>
 <meta name="description" content="Seafood export from Chile. Jumbo squid, Chilean seabass, swordfish, hake, pomfret, rock crab and abalone.">
 <meta property="og:site_name" content="INSIDUS">
-<meta name="theme-color" content="#03070E">
+<meta name="theme-color" content="#04070B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%2304070B%27/%3E%3Crect x=%2714.6%27 y=%278%27 width=%272.8%27 height=%2716%27 fill=%27%23F1F4F6%27/%3E%3Crect x=%278%27 y=%278%27 width=%2716%27 height=%271.6%27 fill=%27%23A9C3D4%27/%3E%3Crect x=%278%27 y=%2722.4%27 width=%2716%27 height=%271.6%27 fill=%27%23A9C3D4%27/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..600,0,0&family=Schibsted+Grotesk:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="/assets/css/insidus.css">
-
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"INSIDUS SpA","email":"mbonilla@valrey.cl","telephone":"+56 9 7637 9609","address":{"@type":"PostalAddress","streetAddress":"Av. Bernardo O'Higgins 2929","addressLocality":"San Antonio","addressRegion":"Valparaiso","addressCountry":"CL"}}</script>
 </head>
 <body data-page="home">
 
@@ -26,6 +27,9 @@
         <button class="lang__btn" id="lang-btn" type="button" aria-haspopup="true" aria-expanded="false"></button>
         <div class="lang__menu" id="lang-menu" role="menu"></div>
       </div>
+      <!-- Reachable from anywhere, at every width. The buyer used to have to
+           reach screen 23 on a phone before an address appeared. -->
+      <a class="nav__cta" id="nav-cta" href="/#contact"></a>
       <button class="nav__toggle" id="menu-open" type="button" aria-expanded="false" aria-controls="menu"></button>
     </div>
   </div>
@@ -41,112 +45,124 @@
 
 <main>
 
-<!-- 01 ................................................. CINEMATIC INTRO -->
-<section class="intro" id="cinematic-intro" data-anim-slot="CinematicIntro">
+<!-- 01 ...................................................... HERO
+     Three layers: media, scrim, content. Replace the contents of
+     .hero__media with an <img> or a looping <video> and nothing else in
+     this file, the stylesheet or the script has to change. -->
+<section class="hero" id="hero" data-anim-slot="CinematicIntro">
+  <div class="hero__media" data-media="hero" data-anim-slot="HeroField"><div class="ph" aria-hidden="true"></div>
+    <div class="slot" aria-hidden="true"></div>
+  </div>
+  <div class="hero__scrim" aria-hidden="true"></div>
   <div class="slot" aria-hidden="true"></div>
-  <div class="intro__in">
+  <div class="hero__in">
     <div class="shell">
-      <p class="intro__coord coord"><i></i><span id="intro-coord"></span></p>
-      <h1 class="intro__brand">INSIDUS</h1>
-      <p class="intro__line" id="intro-line"></p>
+      <p class="hero__eyebrow coord"><i></i><span id="hero-eyebrow"></span></p>
+      <h1 class="hero__brand">INSIDUS</h1>
+      <p class="hero__claim" id="hero-claim"></p>
+      <!-- The proposition is one click from the first frame, not nineteen
+           screens down. Both actions are in the markup from the start: the
+           intro animation decorates around them, it never gates them. -->
+      <div class="hero__acts">
+        <a class="btn btn--solid" id="hero-cta" href="#contact"></a>
+        <a class="btn btn--ghost" id="hero-alt" href="#products"></a>
+      </div>
     </div>
   </div>
-  <div class="intro__foot">
+  <div class="hero__foot">
     <div class="shell" style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
-      <span class="intro__scroll coord"><i></i><span id="intro-scroll"></span></span>
+      <span class="hero__scroll coord"><i></i><span id="hero-scroll"></span></span>
       <span class="coord">33°35′S · 71°37′W</span>
     </div>
   </div>
 </section>
 
-<!-- 02 ............................................... OCEAN TRANSITION -->
-<section class="ocean" id="ocean-transition" data-anim-slot="OceanTransition">
-  <div class="slot" aria-hidden="true"></div>
-  <div class="shell ocean__in">
-    <div class="ocean__grid">
-      <div>
-        <p class="tag tag--accent" id="ocean-kicker"></p>
-        <h2 class="display h-md upper ocean__title" id="ocean-title" style="margin-top:.8rem"></h2>
-      </div>
-      <p class="body" id="ocean-body"></p>
-    </div>
-  </div>
-</section>
-
-<!-- ............................................................. ABOUT -->
-<section class="band" id="about">
-  <div class="shell">
-    <div class="about__grid">
-      <div class="about__meta">
-        <p class="tag" id="about-kicker"></p>
-        <h2 class="display h-lg upper" id="about-title"></h2>
-        <p class="lead" id="about-lead"></p>
-      </div>
-      <div class="stack" id="about-body"></div>
-    </div>
-  </div>
-</section>
-
-<!-- 03 ......................................................... PRODUCTS -->
+<!-- 02 ........................................................ PRODUCTS
+     One species carries the editorial frame; the other seven are an index.
+     The full treatment did not disappear — it lives on /products/<slug>/,
+     which is where a buyer who is actually interested goes. -->
 <section class="band band--deep" id="products">
   <div class="shell">
     <div class="products__head">
       <p class="tag tag--accent" id="products-kicker"></p>
-      <h2 class="display h-lg upper" id="products-title"></h2>
+      <h2 class="display h-sec upper" id="products-title"></h2>
       <p class="lead" id="products-lead"></p>
     </div>
   </div>
   <div class="anim-stage" id="product-animation" data-anim-slot="ProductAnimation">
     <div class="slot" aria-hidden="true"></div>
   </div>
-  <div class="shell" id="products-list"></div>
+  <div class="shell" id="products-featured"></div>
+  <div class="shell">
+    <p class="tag index__kicker" id="products-index-kicker"></p>
+    <div class="index" id="products-index" data-anim-slot="SpeciesIndex">
+      <div class="slot" aria-hidden="true"></div>
+      <ol class="index__list" id="products-index-list"></ol>
+    </div>
+  </div>
 </section>
 
-<!-- 04 .......................................................... PROCESS -->
-<section class="band" id="process">
+<!-- 03 ........................................................... ABOUT
+     The brand statement folded in as the opening line: it was a section of
+     its own saying, at length, what this one sentence says. -->
+<section class="band" id="about">
   <div class="shell">
-    <p class="tag" id="process-kicker"></p>
-    <h2 class="display h-lg upper" id="process-title" style="margin:.8rem 0 1rem"></h2>
-    <p class="lead" id="process-lead"></p>
+    <p class="statement__line" id="statement-line"></p>
+    <div class="about__grid">
+      <div class="about__meta">
+        <p class="tag" id="about-kicker"></p>
+        <h2 class="display h-sec upper" id="about-title"></h2>
+        <p class="lead" id="about-lead"></p>
+      </div>
+      <div class="stack" id="about-body"></div>
+    </div>
+    <div class="figures" id="about-figures"></div>
+  </div>
+</section>
+
+
+
+<!-- 04 ......................................................... CONTROL
+     Quality, process and traceability were three bands with three headings
+     and three leads telling one story. One heading now, three movements
+     under it. The anchors survive as ids on the blocks. -->
+<section class="band band--deep" id="quality">
+  <div class="shell">
+    <div class="head">
+      <p class="tag tag--accent" id="quality-kicker"></p>
+      <h2 class="display h-sec upper" id="quality-title"></h2>
+      <p class="lead" id="quality-lead"></p>
+    </div>
+    <div class="quals" id="quality-list"></div>
   </div>
   <div class="anim-stage" id="process-animation" data-anim-slot="ProcessAnimation">
     <div class="slot" aria-hidden="true"></div>
   </div>
-  <div class="shell"><div class="stages" id="process-list"></div></div>
-</section>
-
-<!-- ........................................................... QUALITY -->
-<section class="band band--deep" id="quality">
   <div class="shell">
-    <p class="tag tag--accent" id="quality-kicker"></p>
-    <h2 class="display h-lg upper" id="quality-title" style="margin:.8rem 0 1rem"></h2>
-    <p class="lead" id="quality-lead"></p>
-    <div class="pairs" id="quality-list"></div>
+    <div class="sub" id="process">
+      <p class="tag" id="process-kicker"></p>
+      <div class="chain" id="process-list"></div>
+    </div>
+    <div class="sub" id="traceability">
+      <p class="tag" id="trace-kicker"></p>
+      <div class="pairs" id="trace-list"></div>
+    </div>
   </div>
 </section>
 
-<!-- ...................................................... TRACEABILITY -->
-<section class="band" id="traceability">
+<!-- 05 .................................................... GLOBAL REACH -->
+<section class="band" id="global">
   <div class="shell">
-    <p class="tag" id="trace-kicker"></p>
-    <h2 class="display h-md upper" id="trace-title" style="margin:.8rem 0 1rem"></h2>
-    <p class="lead" id="trace-lead"></p>
-    <div class="pairs" id="trace-list"></div>
-  </div>
-</section>
-
-<!-- ...................................................... GLOBAL REACH -->
-<section class="band band--deep" id="global">
-  <div class="shell">
-    <p class="tag" id="reach-kicker"></p>
-    <h2 class="display h-lg upper" id="reach-title" style="margin:.8rem 0 1rem"></h2>
-    <p class="lead" id="reach-lead" style="margin-bottom:clamp(2rem,5vh,3.5rem)"></p>
+    <div class="head">
+      <p class="tag" id="reach-kicker"></p>
+      <h2 class="display h-sec upper" id="reach-title"></h2>
+      <p class="lead" id="reach-lead"></p>
+    </div>
     <div class="reach__grid">
       <div>
         <ul class="reach__list" id="reach-list"></ul>
-        <p class="tag" id="reach-note" style="margin-top:1.4rem"></p>
+        <p class="tag" id="reach-note" style="margin-top:1.6rem"></p>
       </div>
-      <!-- Map stage: an SVG, Three.js globe or WebGL layer mounts here later. -->
       <div class="reach__map" id="global-map" data-anim-slot="GlobalMap">
         <div class="slot" aria-hidden="true"></div>
         <span class="coord" id="reach-maplabel"></span>
@@ -155,18 +171,29 @@
   </div>
 </section>
 
-<!-- 05 ..................................................... FINAL MOMENT -->
+<!-- 06 ......................................... CLOSER: B2B + LAST WORD
+     The B2B position and the closing line were two sections that both said
+     "work with us". They close together now, one step above the form. -->
 <section class="final" id="final-animation" data-anim-slot="FinalAnimation">
   <div class="slot" aria-hidden="true"></div>
   <div class="shell">
+    <div class="head">
+      <p class="tag tag--accent" id="partners-kicker"></p>
+      <h2 class="display h-sec upper" id="partners-title"></h2>
+      <p class="lead" id="partners-lead"></p>
+    </div>
+    <div class="partners" id="partners-list"></div>
     <p class="final__line display" id="final-line"></p>
-    <a class="product__cta" id="final-cta" href="#contact" style="margin-top:2.5rem"></a>
+    <a class="btn btn--solid" id="final-cta" href="#contact"></a>
   </div>
 </section>
 
 </main>
 
-<section class="band" id="contact">
+<!-- The form is where the whole page is pointing. Its slot lives on both
+     page kinds, since contact is outside <main> and shared. -->
+<section class="band" id="contact" data-anim-slot="ContactAnimation">
+  <div class="slot" aria-hidden="true"></div>
   <div class="shell">
     <p class="tag" id="contact-kicker"></p>
     <h2 class="display h-md upper" id="contact-title" style="margin:.6rem 0 1rem"></h2>
@@ -199,6 +226,7 @@
       <div>
         <p class="foot__brand">INSIDUS</p>
         <p class="foot__tag" id="foot-tag"></p>
+        <address class="foot__addr" id="foot-addr"></address>
       </div>
       <div class="foot__col"><h3 id="foot-nav-title"></h3><ul id="foot-nav"></ul></div>
       <div class="foot__col"><h3 id="foot-lang-title"></h3><ul id="foot-langs"></ul></div>
@@ -207,8 +235,16 @@
   </div>
 </footer>
 
-<script>window.INSIDUS_CONFIG={"langs": ["es", "en", "zh", "fr", "it", "de", "pt", "ja", "ko"], "label": {"es": "ES", "en": "EN", "zh": "中文", "fr": "FR", "it": "IT", "de": "DE", "pt": "PT", "ja": "日本語", "ko": "한국어"}, "htmlLang": {"es": "es", "en": "en", "zh": "zh-Hans", "fr": "fr", "it": "it", "de": "de", "pt": "pt", "ja": "ja", "ko": "ko"}, "species": [{"slug": "jibia", "n": "01", "name": "JIBIA", "trade": "Jumbo Squid", "bino": "Dosidicus gigas"}, {"slug": "bacalao", "n": "02", "name": "BACALAO", "trade": "Chilean Seabass", "bino": "Dissostichus eleginoides"}, {"slug": "pez-espada", "n": "03", "name": "PEZ ESPADA", "trade": "Swordfish", "bino": "Xiphias gladius"}, {"slug": "merluza-austral", "n": "04", "name": "MERLUZA AUSTRAL", "trade": "Southern Hake", "bino": "Merluccius australis"}, {"slug": "merluza-gayi", "n": "05", "name": "MERLUZA GAYI", "trade": "South Pacific Hake", "bino": "Merluccius gayi"}, {"slug": "reineta", "n": "06", "name": "REINETA", "trade": "Pacific Pomfret", "bino": "Brama australis"}, {"slug": "jaiba", "n": "07", "name": "JAIBA", "trade": "Rock Crab", "bino": "Cancer spp."}, {"slug": "locos", "n": "08", "name": "LOCOS", "trade": "Chilean Abalone", "bino": "Concholepas concholepas"}], "facts": {"email": "mbonilla@valrey.cl", "phone": "+56 9 7637 9609", "address": "Av. Bernardo O'Higgins 2929, San Antonio, Valparaíso, Chile", "originLabel": "Chile · South Pacific"}, "photos": {"bacalao": "/assets/img/bacalao-hi.jpg"}, "thumbs": {"jibia": "/assets/img/calamar.jpg", "bacalao": "/assets/img/bacalao.jpg", "pez-espada": "/assets/img/albacora.jpg", "merluza-austral": "/assets/img/merluza-austral.jpg", "merluza-gayi": "/assets/img/merluza-gayi.jpg", "reineta": "/assets/img/reineta.jpg", "jaiba": "/assets/img/jaiba.jpg", "locos": "/assets/img/locos.jpg"}, "base": "/"};</script>
+<script>window.INSIDUS_CONFIG={"langs": ["es", "en", "zh", "fr", "it", "de", "pt", "ja", "ko"], "label": {"es": "ES", "en": "EN", "zh": "中文", "fr": "FR", "it": "IT", "de": "DE", "pt": "PT", "ja": "日本語", "ko": "한국어"}, "htmlLang": {"es": "es", "en": "en", "zh": "zh-Hans", "fr": "fr", "it": "it", "de": "de", "pt": "pt", "ja": "ja", "ko": "ko"}, "species": [{"slug": "jibia", "n": "01", "name": "JIBIA", "trade": "Jumbo Squid", "bino": "Dosidicus gigas"}, {"slug": "bacalao", "n": "02", "name": "BACALAO", "trade": "Chilean Seabass", "bino": "Dissostichus eleginoides"}, {"slug": "pez-espada", "n": "03", "name": "PEZ ESPADA", "trade": "Swordfish", "bino": "Xiphias gladius"}, {"slug": "merluza-austral", "n": "04", "name": "MERLUZA AUSTRAL", "trade": "Southern Hake", "bino": "Merluccius australis"}, {"slug": "merluza-gayi", "n": "05", "name": "MERLUZA GAYI", "trade": "South Pacific Hake", "bino": "Merluccius gayi"}, {"slug": "reineta", "n": "06", "name": "REINETA", "trade": "Pacific Pomfret", "bino": "Brama australis"}, {"slug": "jaiba", "n": "07", "name": "JAIBA", "trade": "Rock Crab", "bino": "Cancer spp."}, {"slug": "locos", "n": "08", "name": "LOCOS", "trade": "Chilean Abalone", "bino": "Concholepas concholepas"}], "facts": {"email": "mbonilla@valrey.cl", "phone": "+56 9 7637 9609", "address": "Av. Bernardo O'Higgins 2929, San Antonio, Valparaíso, Chile", "originLabel": "Chile · South Pacific", "base": "San Antonio, Chile"}, "photos": {"bacalao": "/assets/img/bacalao-hi.jpg"}, "thumbs": {"jibia": "/assets/img/calamar.jpg", "bacalao": "/assets/img/bacalao.jpg", "pez-espada": "/assets/img/albacora.jpg", "merluza-austral": "/assets/img/merluza-austral.jpg", "merluza-gayi": "/assets/img/merluza-gayi.jpg", "reineta": "/assets/img/reineta.jpg", "jaiba": "/assets/img/jaiba.jpg", "locos": "/assets/img/locos.jpg"}, "productMedia": {}, "base": "/"};</script>
 <script src="/assets/js/insidus.js" defer></script>
 <script src="/assets/js/anim/cinematic-intro.js" defer></script>
+<script src="/assets/js/anim/global-map.js" defer></script>
+<script src="/assets/js/anim/hero-field.js" defer></script>
+<script src="/assets/js/anim/product-reveal.js" defer></script>
+<script src="/assets/js/anim/final-reveal.js" defer></script>
+<script src="/assets/js/anim/species-index.js" defer></script>
+<script src="/assets/js/anim/process-chain.js" defer></script>
+<script src="/assets/js/anim/contact-form.js" defer></script>
+<script src="/assets/js/anim/page-transition.js" defer></script>
 </body>
 </html>
