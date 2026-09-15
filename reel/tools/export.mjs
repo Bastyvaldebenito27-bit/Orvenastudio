@@ -112,9 +112,10 @@ const bar = (i, n) => {
     const t = i / FPS;
     const data = await page.evaluate(([tt, q]) => window.REEL.frameData(tt, q), [t, QUALITY]);
     const buf = Buffer.from(data.slice(data.indexOf(',') + 1), 'base64');
-    /* Portadas: el gancho y el cierre, no el primer frame (que está en negro). */
-    if (i === Math.round(1.9 * FPS)) fs.writeFileSync(path.join(OUT, 'poster.jpg'), buf);
-    if (i === Math.round(26.6 * FPS)) fs.writeFileSync(path.join(OUT, 'poster-cierre.jpg'), buf);
+    /* Portadas: el gancho ya asentado y la placa de cierre. Antes de los 3 s
+       la cámara sigue empujando y recorta el titular. */
+    if (i === Math.round(3.05 * FPS)) fs.writeFileSync(path.join(OUT, 'poster.jpg'), buf);
+    if (i === Math.round(26.9 * FPS)) fs.writeFileSync(path.join(OUT, 'poster-cierre.jpg'), buf);
     await write(buf);
     if (i % 10 === 0 || i === total - 1) bar(i + 1, total);
   }
