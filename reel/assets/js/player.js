@@ -247,9 +247,21 @@
     }
   };
 
-  /* Primer frame visible de inmediato. */
-  document.fonts.ready.then(function () {
-    draw(0.9);
+  /* El canvas sólo pide una tipografía cuando la usa por primera vez, y ese
+     primer cuadro saldría con la de reserva. Se cargan todas por adelantado. */
+  var FACES = [
+    '400 100px Anton', '400 100px "Alfa Slab One"', '600 100px Caveat',
+    '400 100px Archivo', '500 100px Archivo', '600 100px Archivo',
+    '700 100px Archivo', '800 100px Archivo'
+  ];
+
+  /* Primer frame visible en cuanto estén las fuentes y las fotos. */
+  Promise.all([
+    Promise.all(FACES.map(function (f) { return document.fonts.load(f); }))
+      .then(function () { return document.fonts.ready; }),
+    T.M.load()
+  ]).then(function () {
+    draw(1.9);
     window.REEL.ready = true;
   });
 })(window.TATA);

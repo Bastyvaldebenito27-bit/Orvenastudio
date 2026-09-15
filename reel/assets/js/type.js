@@ -7,7 +7,8 @@
   Ty.FAM = {
     display: '"Anton", "Archivo", Impact, sans-serif',
     brand: '"Alfa Slab One", "Archivo", Georgia, serif',
-    sans: '"Archivo", "Helvetica Neue", Arial, sans-serif'
+    sans: '"Archivo", "Helvetica Neue", Arial, sans-serif',
+    hand: '"Caveat", "Segoe Script", cursive'
   };
 
   function fontStr(spec) {

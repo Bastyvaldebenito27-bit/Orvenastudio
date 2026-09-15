@@ -10,6 +10,18 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REEL = path.resolve(__dirname, '..');
+
+/* Las rutas de assets/img se incrustan como data URI: así el archivo funciona
+   solo, sin servidor y sin depender de la carpeta del proyecto. */
+function inlineImages(js, reelDir) {
+  return js.replace(/'(assets\/img\/[\w.-]+)'/g, (m, rel) => {
+    const file = path.join(reelDir, rel);
+    if (!fs.existsSync(file)) return m;
+    const type = rel.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    return "'data:" + type + ";base64," + fs.readFileSync(file).toString('base64') + "'";
+  });
+}
+
 const OUT = path.resolve(process.argv[2] || path.join(REEL, 'dist', 'artifact.html'));
 
 const read = f => fs.readFileSync(path.join(REEL, f), 'utf8');
@@ -21,8 +33,8 @@ const body = src.match(/<body>([\s\S]*?)<\/body>/)[1];
 const css = [...src.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)]
   .map(m => read(m[1])).join('\n');
 
-let js = [...body.matchAll(/<script src="([^"]+)"><\/script>/g)]
-  .map(m => read(m[1])).join('\n');
+let js = inlineImages([...body.matchAll(/<script src="([^"]+)"><\/script>/g)]
+  .map(m => read(m[1])).join('\n'), REEL);
 
 /* El visor de páginas publicadas no concede permiso de descarga, así que aquí
    no se genera ningún enlace de descarga: los botones que lo usaban ya no
