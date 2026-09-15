@@ -80,13 +80,12 @@
     ctx.restore();
 
     /* guirnaldas fuera de foco */
-    ctx.save();
-    ctx.filter = 'blur(16px)';
-    ctx.globalAlpha = 0.85;
-    A.stringLights(ctx, t, { y0: H * 0.12, y1: H * 0.09, sag: 150, count: 13, phase: 2.1, scale: 1.25 });
-    ctx.filter = 'blur(22px)';
-    A.stringLights(ctx, t, { y0: H * 0.93, y1: H * 0.96, sag: -120, count: 11, phase: 0.4, scale: 1.5 });
-    ctx.restore();
+    A.blurGroup(ctx, 16, 0.85, function (c) {
+      A.stringLights(c, t, { y0: H * 0.12, y1: H * 0.09, sag: 150, count: 13, phase: 2.1, scale: 1.25 });
+    });
+    A.blurGroup(ctx, 22, 0.85, function (c) {
+      A.stringLights(c, t, { y0: H * 0.93, y1: H * 0.96, sag: -120, count: 11, phase: 0.4, scale: 1.5 });
+    });
 
     Fx.bokeh(ctx, t, { count: 22, alpha: o.bokeh === undefined ? 0.34 : o.bokeh, seed: 4321 });
     Fx.embers(ctx, t, { count: 26, alpha: 0.42, seed: 5150 });
@@ -107,22 +106,17 @@
     /* farol cálido colgando sobre la mesa */
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    U.glow(ctx, W * 0.5, H * 0.30, W * 0.40, C.ember, 0.28);
+    U.glow(ctx, W * 0.5, H * 0.32, W * 0.46, C.ember, 0.34);
     ctx.restore();
 
     /* gente al fondo, fuera de foco */
-    ctx.save();
-    ctx.filter = 'blur(15px)';
-    ctx.globalAlpha = 0.55;
-    A.crowd(ctx, t, { baseY: H * 0.50, count: 7, h: 195, seed: 313, walk: true, spread: 30 });
-    ctx.restore();
-    ctx.save();
-    ctx.filter = 'blur(10px)';
-    ctx.globalAlpha = 0.9;
-    A.stringLights(ctx, t, { y0: H * 0.16, y1: H * 0.13, sag: 120, count: 12, scale: 1.15 });
-    ctx.filter = 'blur(8px)';
-    A.bunting(ctx, t, { y0: H * 0.055, y1: H * 0.075, sag: 100, count: 12, size: 80 });
-    ctx.restore();
+    A.blurGroup(ctx, 15, 0.55, function (c) {
+      A.crowd(c, t, { baseY: H * 0.50, count: 7, h: 195, seed: 313, walk: true, spread: 30 });
+    });
+    A.blurGroup(ctx, 9, 0.9, function (c) {
+      A.stringLights(c, t, { y0: H * 0.16, y1: H * 0.13, sag: 120, count: 12, scale: 1.15 });
+      A.bunting(c, t, { y0: H * 0.055, y1: H * 0.075, sag: 100, count: 12, size: 80 });
+    });
 
     /* mesa */
     A.board(ctx, -60, H * 0.615, W + 120, H * 0.5, 616);
@@ -130,10 +124,10 @@
     /* charco de luz sobre el tablero: recorta el foco donde va la comida */
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = 0.5;
-    var pool = ctx.createRadialGradient(W * 0.5, H * 0.72, 20, W * 0.5, H * 0.72, W * 0.62);
-    pool.addColorStop(0, U.rgba(C.emberHot, 0.42));
-    pool.addColorStop(0.5, U.rgba(C.ember, 0.14));
+    ctx.globalAlpha = 0.78;
+    var pool = ctx.createRadialGradient(W * 0.5, H * 0.71, 20, W * 0.5, H * 0.71, W * 0.7);
+    pool.addColorStop(0, U.rgba(C.emberHot, 0.5));
+    pool.addColorStop(0.5, U.rgba(C.ember, 0.2));
     pool.addColorStop(1, U.rgba(C.ember, 0));
     ctx.fillStyle = pool;
     ctx.fillRect(0, H * 0.58, W, H * 0.42);
@@ -238,12 +232,10 @@
       bg.addColorStop(1, '#0A0503');
       ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-      ctx.save();
-      ctx.filter = 'blur(15px)';
-      ctx.globalAlpha = 0.8;
-      A.crowd(ctx, t, { baseY: H * 0.24, count: 6, h: 160, seed: 88, walk: true });
-      A.stringLights(ctx, t, { y0: H * 0.10, y1: H * 0.08, sag: 120, count: 12, scale: 1.2 });
-      ctx.restore();
+      A.blurGroup(ctx, 15, 0.8, function (c) {
+        A.crowd(c, t, { baseY: H * 0.24, count: 6, h: 160, seed: 88, walk: true });
+        A.stringLights(c, t, { y0: H * 0.10, y1: H * 0.08, sag: 120, count: 12, scale: 1.2 });
+      });
 
       pushCam(ctx, { s: U.lerp(1.02, 1.14, U.ease.inOutCubic(p)), x: hh.x, y: hh.y + U.lerp(40, -30, p), r: hh.r });
       A.grill(ctx, t, { x: W * 0.5, y: H * 0.435, w: W * 1.05, h: 430, meatScale: 1.45 });
@@ -335,22 +327,18 @@
     ctx.restore();
 
     /* gente al fondo, fuera de foco */
-    ctx.save();
-    ctx.filter = 'blur(18px)';
-    ctx.globalAlpha = 0.55;
-    A.crowd(ctx, t, { baseY: H * 0.90, count: 9, h: 250, seed: 707, walk: true, spread: 50 });
-    ctx.restore();
+    A.blurGroup(ctx, 18, 0.55, function (c) {
+      A.crowd(c, t, { baseY: H * 0.90, count: 9, h: 250, seed: 707, walk: true, spread: 50 });
+    });
 
     /* luces encendiéndose en secuencia */
     var on = U.ease.outCubic(U.norm(lt, 0.18, 1.25));
     A.stringLights(ctx, t, { y0: H * 0.115, y1: H * 0.095, sag: 120, count: 14, on: on, scale: 1.1 });
     A.stringLights(ctx, t, { y0: H * 0.90, y1: H * 0.92, sag: -96, count: 12, on: on, phase: 1.8, scale: 0.9 });
 
-    ctx.save();
-    ctx.filter = 'blur(6px)';
-    ctx.globalAlpha = 0.85;
-    A.bunting(ctx, t, { y0: H * 0.04, y1: H * 0.06, sag: 92, count: 12, size: 70 });
-    ctx.restore();
+    A.blurGroup(ctx, 6, 0.85, function (c) {
+      A.bunting(c, t, { y0: H * 0.04, y1: H * 0.06, sag: 92, count: 12, size: 70 });
+    });
 
     /* letrero bajando desde el alero */
     var drop = U.ease.outBack(U.norm(lt, 0.62, 1.55), 1.05);
@@ -470,12 +458,10 @@
       ctx.globalCompositeOperation = 'screen';
       U.glow(ctx, W * 0.5, H * 0.40, W * 0.72, C.ember, 0.26);
       ctx.restore();
-      ctx.save();
-      ctx.filter = 'blur(16px)';
-      ctx.globalAlpha = 0.7;
-      A.crowd(ctx, t, { baseY: H * 0.38, count: 8, h: 200, seed: 617, walk: true });
-      A.stringLights(ctx, t, { y0: H * 0.11, y1: H * 0.09, sag: 130, count: 12, scale: 1.3 });
-      ctx.restore();
+      A.blurGroup(ctx, 16, 0.7, function (c) {
+        A.crowd(c, t, { baseY: H * 0.38, count: 8, h: 200, seed: 617, walk: true });
+        A.stringLights(c, t, { y0: H * 0.11, y1: H * 0.09, sag: 130, count: 12, scale: 1.3 });
+      });
       Fx.bokeh(ctx, t, { count: 16, alpha: 0.4, seed: 818 });
 
       /* brindis: dos vasos que se acercan y chocan */
@@ -514,10 +500,9 @@
       ctx.restore();
 
       A.stringLights(ctx, t, { y0: H * 0.16, y1: H * 0.13, sag: 150, count: 15, scale: 1.15 });
-      ctx.save();
-      ctx.filter = 'blur(5px)';
-      A.bunting(ctx, t, { y0: H * 0.075, y1: H * 0.095, sag: 110, count: 13, size: 80 });
-      ctx.restore();
+      A.blurGroup(ctx, 5, 1, function (c) {
+        A.bunting(c, t, { y0: H * 0.075, y1: H * 0.095, sag: 110, count: 13, size: 80 });
+      });
 
       /* piso iluminado */
       ctx.save();
@@ -529,11 +514,9 @@
       ctx.fillStyle = fl; ctx.fillRect(0, H * 0.45, W, H * 0.4);
       ctx.restore();
 
-      ctx.save();
-      ctx.filter = 'blur(8px)';
-      ctx.globalAlpha = 0.8;
-      A.crowd(ctx, t, { baseY: H * 0.50, count: 7, h: 160, seed: 919, walk: true });
-      ctx.restore();
+      A.blurGroup(ctx, 8, 0.8, function (c) {
+        A.crowd(c, t, { baseY: H * 0.50, count: 7, h: 160, seed: 919, walk: true });
+      });
       A.guitarist(ctx, W * 0.145, H * 0.600, 300, t, 5);
       A.cuecaPair(ctx, W * 0.58, H * 0.618, 380, t, 3);
       A.person(ctx, W * 0.915, H * 0.606, 268, 250, t, { raise: 1 });
@@ -548,12 +531,10 @@
       bg3.addColorStop(0.4, '#20100A');
       bg3.addColorStop(1, '#090403');
       ctx.fillStyle = bg3; ctx.fillRect(0, 0, W, H);
-      ctx.save();
-      ctx.filter = 'blur(14px)';
-      ctx.globalAlpha = 0.75;
-      A.crowd(ctx, t, { baseY: H * 0.30, count: 8, h: 175, seed: 1212, walk: true });
-      A.stringLights(ctx, t, { y0: H * 0.09, y1: H * 0.07, sag: 120, count: 13, scale: 1.25 });
-      ctx.restore();
+      A.blurGroup(ctx, 14, 0.75, function (c) {
+        A.crowd(c, t, { baseY: H * 0.30, count: 8, h: 175, seed: 1212, walk: true });
+        A.stringLights(c, t, { y0: H * 0.09, y1: H * 0.07, sag: 120, count: 13, scale: 1.25 });
+      });
       A.grill(ctx, t, { x: W * 0.5, y: H * 0.40, w: W * 0.98, h: 330, meatScale: 1.1, seed: 321 });
       A.board(ctx, -50, H * 0.575, W + 100, H * 0.46, 818);
       A.pastry(ctx, W * 0.21, H * 0.655, 0.86, -0.1, 61);
@@ -759,18 +740,15 @@
     ctx.restore();
 
     /* gentío celebrando al fondo */
-    ctx.save();
-    ctx.filter = 'blur(14px)';
-    ctx.globalAlpha = 0.72;
-    A.crowd(ctx, t, { baseY: H * 0.93, count: 11, h: 260, seed: 1313, walk: true, spread: 44 });
-    ctx.restore();
+    A.blurGroup(ctx, 14, 0.72, function (c) {
+      A.crowd(c, t, { baseY: H * 0.93, count: 11, h: 260, seed: 1313, walk: true, spread: 44 });
+    });
 
     A.stringLights(ctx, t, { y0: H * 0.10, y1: H * 0.078, sag: 132, count: 15, scale: 1.15 });
     A.stringLights(ctx, t, { y0: H * 0.955, y1: H * 0.975, sag: -110, count: 12, phase: 2.4, scale: 0.95 });
-    ctx.save();
-    ctx.filter = 'blur(4px)';
-    A.bunting(ctx, t, { y0: H * 0.035, y1: H * 0.055, sag: 92, count: 13, size: 74 });
-    ctx.restore();
+    A.blurGroup(ctx, 4, 1, function (c) {
+      A.bunting(c, t, { y0: H * 0.035, y1: H * 0.055, sag: 92, count: 13, size: 74 });
+    });
 
     /* banderas ondeando a los costados */
     var fw = U.ease.outCubic(U.norm(lt, 0.1, 0.7));

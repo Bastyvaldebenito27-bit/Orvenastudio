@@ -7,6 +7,35 @@
   var A = {};
   var W = U.W, H = U.H;
 
+  /* ================= DESENFOQUE DE GRUPO =================
+     ctx.filter aplica el desenfoque a cada operación de dibujo, así que un
+     grupo de siluetas fuera de foco cuesta un filtro por trazo. Aquí el grupo
+     se dibuja una vez en un lienzo auxiliar a media resolución y se compone
+     con un solo drawImage desenfocado: mismo resultado, una fracción del costo. */
+  var pool = [];
+  A.blurGroup = function (ctx, blurPx, alpha, draw) {
+    var cv = pool.pop();
+    if (!cv) {
+      cv = document.createElement('canvas');
+      cv.width = Math.ceil(W / 2); cv.height = Math.ceil(H / 2);
+    }
+    var c = cv.getContext('2d');
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.clearRect(0, 0, cv.width, cv.height);
+    c.save();
+    c.scale(0.5, 0.5);
+    draw(c);
+    c.restore();
+
+    ctx.save();
+    ctx.globalAlpha = alpha === undefined ? 1 : alpha;
+    ctx.filter = 'blur(' + (blurPx / 2).toFixed(2) + 'px)';
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(cv, 0, 0, W, H);
+    ctx.restore();
+    pool.push(cv);
+  };
+
   /* ================= CIELO ================= */
   A.sky = function (ctx, t, o) {
     o = o || {};
@@ -43,13 +72,17 @@
       var cx = (r2() * 1.4 - 0.2) * W + Math.sin(t * 0.02 + k) * 18;
       var cw = 200 + r2() * 480, ch = 12 + r2() * 26;
       ctx.globalAlpha = 0.10 + r2() * 0.14;
-      ctx.filter = 'blur(' + (10 + r2() * 16).toFixed(1) + 'px)';
-      var cg = ctx.createLinearGradient(cx - cw / 2, cy, cx + cw / 2, cy);
-      cg.addColorStop(0, 'rgba(255,170,90,0)');
-      cg.addColorStop(0.5, 'rgba(255,186,110,0.85)');
+      /* el degradado radial ya entrega el borde difuso: sale más barato que
+         aplicar un filtro de desenfoque sobre cada nube */
+      var cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, cw / 2);
+      cg.addColorStop(0, 'rgba(255,190,115,0.8)');
+      cg.addColorStop(0.45, 'rgba(255,178,100,0.42)');
       cg.addColorStop(1, 'rgba(255,170,90,0)');
       ctx.fillStyle = cg;
-      ctx.beginPath(); ctx.ellipse(cx, cy, cw / 2, ch, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.save();
+      ctx.translate(cx, cy); ctx.scale(1, (ch * 2.2) / cw);
+      ctx.beginPath(); ctx.arc(0, 0, cw / 2, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
     ctx.restore();
 
@@ -83,14 +116,31 @@
 
   A.hills = function (ctx, t, horizon, px) {
     px = px || 0;
-    ctx.save(); ctx.translate(px * 0.25, 0);
-    ridge(ctx, horizon - 6, 120, 3.1, '#2B2036', 0.9, 6);
-    ctx.restore();
-    ctx.save(); ctx.translate(px * 0.5, 0);
-    ridge(ctx, horizon + 26, 92, 7.7, '#1A1526', 0.95, 3);
-    ctx.restore();
+    /* las dos cordilleras del fondo van juntas en una sola pasada desenfocada */
+    A.blurGroup(ctx, 5, 1, function (c) {
+      c.save(); c.translate(px * 0.25, 0);
+      ridge(c, horizon - 6, 120, 3.1, '#2B2036', 0.9, 0);
+      c.restore();
+      c.save(); c.translate(px * 0.5, 0);
+      ridge(c, horizon + 26, 92, 7.7, '#1A1526', 0.95, 0);
+      c.restore();
+    });
     ctx.save(); ctx.translate(px * 0.8, 0);
     ridge(ctx, horizon + 74, 62, 12.4, '#0E0C16', 1, 0);
+    ctx.restore();
+  };
+
+  /* Sombra de contacto: un degradado radial cuesta mucho menos que aplicar un
+     filtro de desenfoque a una elipse, y a este tamaño se ve igual. */
+  A.contactShadow = function (ctx, x, y, rx, ry, alpha) {
+    ctx.save();
+    var g = ctx.createRadialGradient(x, y, 0, x, y, rx);
+    g.addColorStop(0, 'rgba(0,0,0,' + (alpha === undefined ? 0.9 : alpha) + ')');
+    g.addColorStop(0.55, 'rgba(0,0,0,' + (alpha === undefined ? 0.9 : alpha) * 0.5 + ')');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.translate(x, y); ctx.scale(1, ry / rx); ctx.translate(-x, -y);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, rx, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   };
 
@@ -588,13 +638,7 @@
     ctx.rotate(rot || 0);
     ctx.scale(s, s);
 
-    /* sombra de contacto, corta y oscura */
-    ctx.save();
-    ctx.globalAlpha = 0.8;
-    ctx.filter = 'blur(12px)';
-    ctx.fillStyle = 'rgba(0,0,0,0.95)';
-    ctx.beginPath(); ctx.ellipse(4, 40, 88, 15, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
+    A.contactShadow(ctx, 4, 36, 92, 15, 0.6);
 
     function bodyPath() {
       ctx.beginPath();
@@ -622,11 +666,11 @@
     /* cuerpo */
     bodyPath();
     var g = ctx.createLinearGradient(-50, -58, 40, 44);
-    g.addColorStop(0, '#F8C976');
-    g.addColorStop(0.2, '#E29B41');
-    g.addColorStop(0.5, '#BC6C26');
-    g.addColorStop(0.78, '#7E4113');
-    g.addColorStop(1, '#4A2409');
+    g.addColorStop(0, '#FFD98C');
+    g.addColorStop(0.22, '#EFA94D');
+    g.addColorStop(0.52, '#CB7A2C');
+    g.addColorStop(0.8, '#8C4A16');
+    g.addColorStop(1, '#53290B');
     ctx.fillStyle = g;
     ctx.fill();
 
@@ -635,15 +679,21 @@
     bodyPath(); ctx.clip();
     for (var k = 0; k < 14; k++) {
       var bx = -84 + r() * 168, by = -46 + r() * 74;
-      ctx.globalAlpha = 0.24 + r() * 0.28;
-      ctx.filter = 'blur(' + (3 + r() * 5).toFixed(1) + 'px)';
-      ctx.beginPath();
-      ctx.ellipse(bx, by, 7 + r() * 17, 4 + r() * 9, r() * 3, 0, Math.PI * 2);
-      ctx.fillStyle = r() > 0.45 ? '#6E3810' : '#FFD48C';
-      ctx.fill();
+      var br = 8 + r() * 16;
+      ctx.globalAlpha = 0.26 + r() * 0.3;
+      /* degradado radial: el borde ya sale difuso sin pasar por un filtro */
+      var bg2 = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+      var tone = r() > 0.45 ? '110,56,16' : '255,212,140';
+      bg2.addColorStop(0, 'rgba(' + tone + ',0.95)');
+      bg2.addColorStop(0.55, 'rgba(' + tone + ',0.5)');
+      bg2.addColorStop(1, 'rgba(' + tone + ',0)');
+      ctx.fillStyle = bg2;
+      ctx.save();
+      ctx.translate(bx, by); ctx.scale(1, 0.55); ctx.translate(-bx, -by);
+      ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
     /* sombra bajo el borde superior */
-    ctx.filter = 'none';
     ctx.globalAlpha = 0.5;
     var us = ctx.createLinearGradient(0, 4, 0, 46);
     us.addColorStop(0, 'rgba(60,26,6,0)');
@@ -655,14 +705,12 @@
     /* brillo especular del dorado */
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = 0.3;
-    ctx.filter = 'blur(9px)';
-    ctx.beginPath();
-    ctx.ellipse(-28, -32, 32, 10, -0.3, 0, Math.PI * 2);
-    ctx.fillStyle = '#FFE6B4';
-    ctx.fill();
+    ctx.globalAlpha = 0.5;
+    ctx.save();
+    ctx.translate(-28, -32); ctx.rotate(-0.3); ctx.scale(1, 0.34); ctx.translate(28, 32);
+    U.glow(ctx, -28, -32, 42, '#FFEDC8', 0.85);
+    ctx.restore();
     ctx.globalAlpha = 0.62;
-    ctx.filter = 'blur(2px)';
     ctx.beginPath();
     ctx.ellipse(-36, -35, 13, 4, -0.32, 0, Math.PI * 2);
     ctx.fillStyle = '#FFF4DC';
@@ -806,12 +854,7 @@
     ctx.rotate(rot);
     ctx.scale(s * (0.9 + r() * 0.22), s * (0.88 + r() * 0.26));
 
-    /* sombra de contacto */
-    ctx.save();
-    ctx.globalAlpha = 0.9; ctx.filter = 'blur(11px)';
-    ctx.fillStyle = 'rgba(0,0,0,0.95)';
-    ctx.beginPath(); ctx.ellipse(4, 34, 74, 15, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
+    A.contactShadow(ctx, 4, 30, 78, 15, 0.7);
 
     /* contorno irregular, no una elipse */
     function shape(dy) {
@@ -856,12 +899,14 @@
       ctx.moveTo(j * 34 - 20, -60); ctx.lineTo(j * 34 + 20, 60); ctx.stroke();
     }
 
-    /* borde chamuscado */
-    ctx.globalAlpha = 0.55;
-    ctx.filter = 'blur(10px)';
-    ctx.strokeStyle = '#0C0402'; ctx.lineWidth = 26;
-    shape(0); ctx.stroke();
-    ctx.filter = 'none';
+    /* borde chamuscado: viñeta interior en vez de un trazo desenfocado */
+    ctx.globalAlpha = 0.6;
+    var ch = ctx.createRadialGradient(0, -6, 28, 0, -6, 88);
+    ch.addColorStop(0, 'rgba(12,4,2,0)');
+    ch.addColorStop(0.62, 'rgba(12,4,2,0.35)');
+    ch.addColorStop(1, 'rgba(12,4,2,0.95)');
+    ctx.fillStyle = ch;
+    ctx.fillRect(-100, -60, 200, 120);
 
     /* vetas de grasa */
     ctx.globalAlpha = 0.16;
@@ -877,7 +922,6 @@
     /* luz de las brasas subiendo por el canto inferior, difusa y recortada */
     ctx.globalCompositeOperation = 'screen';
     ctx.globalAlpha = 0.26;
-    ctx.filter = 'blur(10px)';
     var rim = ctx.createLinearGradient(0, 28, 0, 4);
     rim.addColorStop(0, U.rgba(C.emberHot, 0.9));
     rim.addColorStop(1, U.rgba(C.ember, 0));
@@ -888,12 +932,9 @@
     /* jugos brillantes */
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = 0.26 + 0.1 * Math.sin((t || 0) * 2 + seed);
-    ctx.filter = 'blur(7px)';
-    ctx.beginPath(); ctx.ellipse(-16, -22, 26, 7, -0.22, 0, Math.PI * 2);
-    ctx.fillStyle = '#FFC178'; ctx.fill();
+    ctx.globalAlpha = 0.3 + 0.12 * Math.sin((t || 0) * 2 + seed);
+    U.glow(ctx, -16, -22, 30, '#FFC178', 0.55);
     ctx.globalAlpha = 0.5;
-    ctx.filter = 'blur(2px)';
     ctx.beginPath(); ctx.ellipse(-26, -27, 11, 3, -0.24, 0, Math.PI * 2);
     ctx.fillStyle = '#FFEBC8'; ctx.fill();
     ctx.globalAlpha = 0.45;
@@ -1049,7 +1090,6 @@
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     var r = U.rng(19);
-    ctx.filter = 'blur(2px)';
     for (var i = 0; i < 46; i++) {
       var x = r() * W + px * 0.6, y = horizon + 22 + r() * 54;
       ctx.globalAlpha = 0.35 + 0.4 * U.fbm1(t * 1.2 + i * 3);
@@ -1070,23 +1110,22 @@
     ctx.restore();
 
     /* gente */
-    A.crowd(ctx, t, { baseY: H * 0.855 + py * 0.6, count: 9, h: 190, alpha: 0.85, blur: 3, seed: 21, walk: true });
+    A.crowd(ctx, t, { baseY: H * 0.855 + py * 0.6, count: 9, h: 190, alpha: 0.85, seed: 21, walk: true });
     A.crowd(ctx, t, { baseY: H * 0.90 + py * 0.7, count: 7, h: 250, alpha: 1, seed: 45, walk: true, spread: 40 });
 
     /* guirnalda de banderas en primer plano (desenfocada) */
     ctx.save();
     ctx.translate(px * 1.5, py * 1.1);
-    ctx.filter = 'blur(7px)';
-    A.flagLine(ctx, t, { y0: H * 0.055, y1: H * 0.085, sag: 96, count: 6, size: 118 });
+    A.blurGroup(ctx, 7, 1, function (c) {
+      A.flagLine(c, t, { y0: H * 0.055, y1: H * 0.085, sag: 96, count: 6, size: 118 });
+    });
     ctx.restore();
 
     /* primer plano: hombros y cabezas muy cerca de la cámara, fuera de foco */
     ctx.save();
     ctx.translate(px * 2.2, py * 1.4);
-    ctx.filter = 'blur(20px)';
-    A.crowd(ctx, t, {
-      baseY: H * 1.17, count: 5, h: 700, alpha: 0.95, seed: 909,
-      x0: -0.1, x1: 1.1, spread: 30
+    A.blurGroup(ctx, 20, 0.95, function (c) {
+      A.crowd(c, t, { baseY: H * 1.17, count: 5, h: 700, seed: 909, x0: -0.1, x1: 1.1, spread: 30 });
     });
     ctx.restore();
 
