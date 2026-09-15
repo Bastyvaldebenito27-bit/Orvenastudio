@@ -1,0 +1,12 @@
+{
+  "name": "cocina-del-tata-reel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reel publicitario vertical 9:16 para La Cocina del Tata — Fiesta de la Chilenidad, Santo Domingo.",
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes http-server -p 8080 -c-1 .",
+    "export": "node tools/export.mjs",
+    "bundle": "node tools/bundle.mjs"
+  }
+}
