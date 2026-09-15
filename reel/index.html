@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Cocina del Tata</title>
+<meta name="description" content="Reel publicitario vertical 9:16 para La Cocina del Tata en la Fiesta de la Chilenidad de Santo Domingo.">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/css/reel.css">
+</head>
+<body>
+
+<div class="masthead">
+  <span class="aside">Reel 9:16 · 1080×1920 · 28,8 s</span>
+  <span class="dot aside">◆</span>
+  <b>La Cocina del Tata</b>
+  <span class="dot aside">◆</span>
+  <span class="aside">Santo Domingo</span>
+</div>
+
+<div class="stage-wrap">
+  <div class="stage">
+    <canvas id="reel" width="1080" height="1920"></canvas>
+    <div class="overlay" id="overlay">
+      <div class="play-btn">
+        <div class="play-circle">
+          <svg width="34" height="38" viewBox="0 0 34 38" aria-hidden="true">
+            <path d="M2 2.6 32 19 2 35.4Z" fill="#2A1206"/>
+          </svg>
+        </div>
+        <div class="play-label">Reproducir reel</div>
+      </div>
+    </div>
+    <div class="scrubber"><i id="bar"></i></div>
+  </div>
+</div>
+
+<div class="meta">
+  <span id="clock">0.0s / 28.8s</span>
+  <span class="scene" id="sceneName">HOOK</span>
+  <span id="fps">—</span>
+</div>
+
+<div class="controls">
+  <button class="ctl primary" id="btnPlay">Reproducir</button>
+  <button class="ctl" id="btnRestart">Reiniciar</button>
+  <button class="ctl" id="btnSound" data-on="true">Sonido: ON</button>
+  <button class="ctl" id="btnRec">Grabar video</button>
+  <button class="ctl" id="btnFrame">Guardar frame PNG</button>
+  <button class="ctl" id="btnWav">Descargar música WAV</button>
+  <button class="ctl" id="btnSafe" data-on="false">Zona segura</button>
+</div>
+
+<div class="status" id="status">Pulsa reproducir. El audio se sintetiza en el navegador.</div>
+
+<script src="assets/js/util.js"></script>
+<script src="assets/js/glyphs.js"></script>
+<script src="assets/js/type.js"></script>
+<script src="assets/js/fx.js"></script>
+<script src="assets/js/media.js"></script>
+<script src="assets/js/art.js"></script>
+<script src="assets/js/audio.js"></script>
+<script src="assets/js/reel.js"></script>
+<script src="assets/js/player.js"></script>
+
+</body>
+</html>
